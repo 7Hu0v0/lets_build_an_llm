@@ -16,8 +16,8 @@ Do not add unnecessary categories, frameworks, or abstractions. Every concept mu
 2. explaining a technical concept clearly;
 3. preparing candidate pre-talk;
 4. judging candidate capability;
-5. mapping AI teams and talent.
-6. 多参考开源模型以获取更多信息，instead of 捕风捉影闭源模型、参考闭源模型很过时的博客
+5. mapping AI teams and talent;
+6. learning from open-source models and primary sources instead of relying on rumors or outdated secondary posts about closed-source models.
 
 ## Main Pipeline
 
@@ -37,35 +37,67 @@ Always organize knowledge around the LLM industrial pipeline:
 
 Do not create separate top-level categories for multimodal, world model, coding agent, search agent, computer use, robotics, or enterprise AI. Place them into the relevant pipeline stage.
 
-## Default Output Format
+## Default Reference Format
 
-When explaining a topic, use the following structure:
+When creating or rewriting a reference file, prefer the narrative system style used by `references/01_core_pipeline/01g_post_training.md`.
 
+```markdown
 # Topic
+English Subtitle / One-line Technical Positioning
+> 中文直觉解释：用一句话说明这个 topic 到底解决什么问题
+
+## Table of Contents
+
+- [TL;DR](#tldr)
+- [Definition](#definition)
+- [Pipeline Position](#pipeline-position)
+- [Core Question](#core-question)
+- [Core Mechanism](#core-mechanism)
+- [System View](#system-view)
+- [Recruiting Translation](#recruiting-translation)
+- [Sources](#sources)
 
 ## TL;DR
-Explain the topic in 3-5 sentences.
+
+用 2-4 段说明这个 topic 的核心价值：
+它是什么、为什么重要、它在 LLM 工业链路里改变了什么。
 
 ## Definition
-Give a precise definition. Keep key technical terms in English.
+
+给出精确定义。
+可以使用 Python-like pseudo code、公式、流程图或 bullet list，把概念表达得更结构化。
 
 ## Pipeline Position
-Explain where this topic fits in the LLM industrial pipeline, including upstream dependencies and downstream impact.
 
-## Technical Mechanism
-Explain how it works, what problem it solves, and the key trade-offs.
+说明它位于 LLM pipeline 的哪一段，包括 upstream dependencies、downstream impact 和 stage boundary。
 
-## Pre-talk Techniques
-Convert the technical concept into recruiting judgment.
+## Core Question
 
-Include:
-- Candidate Signal: strong signals, weak signals, risk signals;
-- Talk Track: opening questions, deep-dive questions, follow-up questions, red flags;
-- Role / Team Mapping: relevant roles, teams, lab ownership, and Tencent relevance;
-- Simple Analogy: one analogy for non-technical audiences.
+回答这个 topic 最本质的问题。
+
+## Core Mechanism
+
+拆解核心机制、方法或组成部分。
+
+## System View
+
+从系统角度解释它如何与 data、training、evaluation、inference、agent、online feedback 形成闭环。
+
+## Recruiting Translation
+
+把技术理解转化为候选人判断。
+
+建议包含：
+- Candidate Signal：strong signals、weak signals、risk signals
+- Talk Track：opening question、deep-dive question、follow-up question
+- Role / Team Mapping：相关岗位、团队 ownership、上下游协作
+- Red Flags：容易夸大或误判的地方
 
 ## Sources
-List papers, technical reports, official blogs, benchmarks, GitHub repos, or company announcements. Mark unverified claims as inference or hypothesis.
+
+列出 papers、technical reports、official blogs、benchmarks、GitHub repos、model cards 或 company announcements。
+未验证的信息必须标记为 inference / hypothesis。
+```
 
 ## Reference Usage
 
@@ -73,27 +105,22 @@ Use files under `references/` as the knowledge base.
 
 Recommended reference mapping:
 
-- `references/project_principles.md`: project goals, writing rules, and constraints.
-- `references/llm_pipeline.md`: overview of the LLM industrial pipeline.
-- `references/glossary.md`: definitions of key terms.
-- `references/what_are_we_building.md`: definition of LLM and model types.
-- `references/compute_and_codesign.md`: compute, GPU clusters, and co-design.
-- `references/data.md`: data sources, cleaning, mixture, and datasets.
-- `references/architecture.md`: Transformer, attention, MoE, long context, multimodal architecture.
-- `references/training_infra.md`: distributed training, parallelism, checkpointing, stability.
-- `references/pretraining.md`: base model training and next-token prediction.
-- `references/mid_training.md`: continued training for code, math, long-context, domain, tool traces.
-- `references/post_training_and_rl_infra.md`: SFT, RLHF, DPO, RLVR, GRPO, rollout, reward, sandbox.
-- `references/evaluation.md`: benchmark, internal eval, real-world task eval.
-- `references/inference_and_deployment.md`: serving, KV cache, batching, quantization, deployment.
-- `references/agent_and_tool_use.md`: tool calling, browser, terminal, memory, planning, agent workflow.
-- `references/online_feedback.md`: online data, failure mining, continuous post-training.
-- `references/people_and_org_mapping.md`: AI lab teams, roles, candidate signals.
-- `references/papers.md`: paper index.
-- `references/model_cards.md`: model card and technical report index.
-- `references/benchmarks.md`: benchmark index.
-- `references/companies_and_labs.md`: company and lab mapping.
-
+- `references/00_index.md`: the master index, reading order, and default reference template.
+- `references/01_core_pipeline/01a_compute.md`: compute, GPU clusters, networking, storage, scheduling, and training resources.
+- `references/01_core_pipeline/01b_data.md`: data sources, cleaning, filtering, deduplication, mixture, and dataset roles.
+- `references/01_core_pipeline/01c_architecture.md`: Transformer, Attention, MoE, long context, multimodal architecture, and architecture trade-offs.
+- `references/01_core_pipeline/01d_training_infra.md`: distributed training, parallelism, communication, checkpointing, fault tolerance, and stability.
+- `references/01_core_pipeline/01e_pretraining.md`: base model training and next-token prediction.
+- `references/01_core_pipeline/01f_mid_training.md`: continued training for code, math, long context, domain knowledge, tool traces, and multimodal capability.
+- `references/01_core_pipeline/01g_post_training.md`: SFT, RL, verifier, agentic data, safety, distillation, evaluation loop, and behavior optimization.
+- `references/01_core_pipeline/01h_evaluation.md`: benchmark, internal eval, real-world task eval, and regression testing.
+- `references/01_core_pipeline/01i_inference.md`: serving, KV cache, batching, quantization, speculative decoding, latency, throughput, and deployment cost.
+- `references/01_core_pipeline/01j_agent.md`: tool calling, browser use, terminal use, planning, memory, orchestration, and agent workflow.
+- `references/01_core_pipeline/01k_online_feedback.md`: online data, failure mining, user feedback, A/B testing, and continuous post-training.
+- `references/02_core_concept/02a_category.md`: reusable concept entry point for training signals, learning rate, and related fundamentals.
+- `references/03_models/`: model family notes for GPT, Claude, Gemini, DeepSeek, Qwen, Llama, and Hunyuan.
+- `references/04_benchmarks/`: benchmark notes for MMLU, GPQA, SWE-bench, Terminal-Bench, and BrowseComp.
+- `references/05_recruiting/`: recruiting translation notes for role mapping, candidate signals, pre-talk questions, and lab org mapping.
 
 ## Writing Rules
 
