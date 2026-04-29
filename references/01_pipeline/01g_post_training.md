@@ -2,6 +2,16 @@
 From Instruction Alignment to Agentic Capability Construction
 > 从“让模型会回答”到“让模型会推理、会调用工具、会解决问题”
 
+## Table of Contents
+
+- [TL;DR](#tldr)
+- [Definition](#definition)
+- [Pipeline Position](#pipeline-position)
+- [What Changes After Post-training](#what-changes-after-post-training)
+- [Core Methods](#core-methods)
+- [System View & Data Loop](#system-view--data-loop)
+
+
 ## TL;DR
 
 Post-training 是把 base model 训练成可用模型的关键阶段，模型从“会预测下一个 token”塑造成“会遵循指令、会推理、会调用工具、会解决问题”。
