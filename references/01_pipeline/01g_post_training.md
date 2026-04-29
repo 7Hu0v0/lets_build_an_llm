@@ -96,5 +96,24 @@ flowchart TD
 
 ## What Changes After Post-training
 ## What Changes After Post-training
+
 ## Core Method
+Post-training 的核心配方可以极简理解为两类：
+> 1. **SFT（Supervised Fine-Tuning）**  
+> 
+>    让模型学会按照人类期望的格式和方式回答。
+> 
+> 2. **RL（Reinforcement Learning）**  
+> 
+>   让模型通过 reward / verifier / human preference 进一步优化行为，学会什么答案更好、什么任务算完成。
+
+其他常见术语，例如 RLHF、RLAIF、RLVR、DPO、GRPO、Rejection Sampling、Distillation 和 Safety Alignment，并不是脱离 SFT / RL 之外的“第三套主配方”，而是围绕这两类核心方法展开的不同实现路径、数据策略、奖励机制或训练闭环。
+
+因此，本节先聚焦 post-training 在算法层面的核心 recipe：SFT 如何让模型学会回应，RL 如何让模型学会优化行为。至于数据、reward、eval、infra 和 safety 如何共同组成完整生态，我们将在下一节从 system view 展开。
+
+
+
+
+
+
 ## System View & Data Loop
