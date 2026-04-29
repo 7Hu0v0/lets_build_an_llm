@@ -84,7 +84,7 @@ flowchart TD
     D4 --> D2
     D4 --> D3
 
-    D3 --> E[Chat Model / Reasoning Model / Agent Model]
+    D3 --> E[Integration]
     E --> F[Deployment]
     F --> G[Online Feedback]
     G --> C
