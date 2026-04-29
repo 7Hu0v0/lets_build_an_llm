@@ -85,9 +85,11 @@ flowchart TD
     D4 --> D3
 
     D3 --> E[Integration]
-    E --> F[Deployment]
-    F --> G[Online Feedback]
-    G --> C
+    E --> F[Instruct Model]
+    F --> G[Deployment]
+    G --> H[Online Feedback]
+    H --> C
+
 ```
 
 ## What Changes After Post-training
