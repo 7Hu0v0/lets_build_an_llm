@@ -69,26 +69,35 @@ PostTraining(BaseModel) = optimize_behavior(
 
 Post-training 位于 pretraining 之后、deployment 之前，是 base model 到产品模型之间的关键桥梁。
 
-```text
-Pretraining
-  ↓
-Base Model
-  ↓
-Post-training
-  ├── SFT
-  ├── Reward / Verifier
-  ├── RLHF / RLAIF / RLVR / GRPO / PPO
-  ├── DPO / IPO / KTO
-  ├── Rejection Sampling / Best-of-N
-  ├── Distillation / On-Policy Distillation
-  ├── Tool-use Training
-  ├── Agentic RL
-  └── Safety Alignment
-  ↓
-Chat Model / Reasoning Model / Agent Model
-  ↓
-Evaluation
-  ↓
-Deployment
-  ↓
-Online Feedback
+```mermaid
+flowchart TD
+    A[Pretraining] --> B[Base Model]
+    B --> C[Post-training]
+    
+    C --> C1[SFT<br/>Instruction Following]
+    C --> C2[Reward / Verifier<br/>Preference & Verifiable Signal]
+    C --> C3[Preference Optimization<br/>RLHF / RLAIF / DPO / IPO / KTO]
+    C --> C4[Verifiable RL<br/>RLVR / GRPO / PPO]
+    C --> C5[Sampling & Selection<br/>Rejection Sampling / Best-of-N]
+    C --> C6[Distillation<br/>Distillation / On-Policy Distillation]
+    C --> C7[Tool-use & Agent Training<br/>Tool-use Training / Agentic RL]
+    C --> C8[Safety Alignment]
+    
+    C1 --> D[Chat Model / Reasoning Model / Agent Model]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    C5 --> D
+    C6 --> D
+    C7 --> D
+    C8 --> D
+    
+    D --> E[Evaluation]
+    E --> F[Deployment]
+    F --> G[Online Feedback]
+    G --> C
+```
+## What Changes After Post-training
+## What Changes After Post-training
+## Core Method
+## System View & Data Loop
