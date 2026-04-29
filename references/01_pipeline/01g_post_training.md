@@ -68,34 +68,27 @@ PostTraining(BaseModel) = optimize_behavior(
 ## Pipeline Position
 
 Post-training 位于 pretraining 之后、deployment 之前，是 base model 到产品模型之间的关键桥梁。
-
 ```mermaid
 flowchart TD
     A[Pretraining] --> B[Base Model]
     B --> C[Post-training System]
 
     C --> D1[SFT]
-    C --> D2[Reward / Verifier]
-    C --> D3[Preference Optimization]
-    C --> D4[Verifiable RL]
-    C --> D5[Tool-use & Agent Training]
-    C --> D6[Safety Alignment]
-    C --> D7[Distillation]
+    C --> D2[RL]
+    C --> D3[Eval]
+    C --> D4[Infra]
 
-    D1 --> E[Deployable Model]
-    D2 --> E
-    D3 --> E
-    D4 --> E
-    D5 --> E
-    D6 --> E
-    D7 --> E
+    D1 --> D2
+    D2 --> D3
+    D4 --> D1
+    D4 --> D2
+    D4 --> D3
 
-    E --> F[Evaluation]
-    F --> G[Deployment]
-    G --> H[Online Feedback]
-    H --> C
-```
-```
+    D3 --> E[Chat Model / Reasoning Model / Agent Model]
+    E --> F[Deployment]
+    F --> G[Online Feedback]
+    G --> C
+
 
 ## What Changes After Post-training
 ## What Changes After Post-training
