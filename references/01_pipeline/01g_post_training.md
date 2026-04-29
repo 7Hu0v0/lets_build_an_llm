@@ -71,25 +71,12 @@ Post-training 位于 pretraining 之后、deployment 之前，是 base model 到
 ```mermaid
 flowchart TD
     A[Pretraining] --> B[Base Model]
-
-    B --> C["Post-training System
-
-    • SFT (Instruction Tuning)
-    • Reward / Verifier
-    • Preference Optimization (RLHF / DPO / ...)
-    • Verifiable RL (RLVR / GRPO / ...)
-    • Sampling & Selection
-    • Distillation / OPD
-    • Tool-use & Agent Training
-    • Safety Alignment"]
-
+    B --> C["Post-training<br/><br/>SFT<br/>Reward / Verifier<br/>RLHF / RLAIF / RLVR / GRPO / PPO<br/>DPO / IPO / KTO<br/>Rejection Sampling / Best-of-N<br/>Distillation / OPD<br/>Tool-use Training<br/>Agentic RL<br/>Safety Alignment"]
     C --> D[Chat Model / Reasoning Model / Agent Model]
-
     D --> E[Evaluation]
     E --> F[Deployment]
     F --> G[Online Feedback]
-
-    G -.-> C
+    G --> C
 ```
 
 ## What Changes After Post-training
