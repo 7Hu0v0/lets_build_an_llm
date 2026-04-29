@@ -97,7 +97,7 @@ flowchart TD
 ## What Changes After Post-training
 ## What Changes After Post-training
 
-## Core Method
+## Core Methods
 Post-training 的核心配方可以极简理解为两类：
 > 1. **SFT（Supervised Fine-Tuning）**  
 > 
