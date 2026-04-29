@@ -7,9 +7,12 @@
 它是一套面向和我一样的 Non-Tech Staff的 **LLM 工业系统 Wiki**，用尽量清楚、结构化、可复用的方式，拆解一个现代大模型从哪里来、怎么训练、怎么部署、怎么变聪明。
 
 **我的核心原则是：**
-> Principle I == Reject("够用就行")
-> Principle II == Reject("建一个博物馆")
-> Principle III == Reject("最近很火的")
+> + Principle I   == Reject("够用就行");
+>
+>  +  - Principle II  == Reject("建一个博物馆");
+>
+>  ! Principle III == Reject("最近很火的");
+
 
 我们会沿着这条主线走：
 
