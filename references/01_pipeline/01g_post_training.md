@@ -100,12 +100,10 @@ flowchart TD
 ## Core Methods
 Post-training 的核心配方可以极简理解为两类：
 > 1. **SFT（Supervised Fine-Tuning）**  
-> 
->    让模型学会按照人类期望的格式和方式回答。
+>    基于高质量 interaction-response，让模型模仿人类或强模型提供的标准示范，
 > 
 > 2. **RL（Reinforcement Learning）**  
-> 
->   让模型通过 reward / verifier / human preference 进一步优化行为，学会什么答案更好、什么任务算完成。
+>    让模型通过 reward / verifier / human preference 进一步优化行为，学会什么答案更好、什么任务算完成。
 
 其他常见术语，例如 RLHF、RLAIF、RLVR、DPO、GRPO、Rejection Sampling、Distillation 和 Safety Alignment，并不是脱离 SFT / RL 之外的“第三套主配方”，而是围绕这两类核心方法展开的不同实现路径、数据策略、奖励机制或训练闭环。
 
