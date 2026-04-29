@@ -68,6 +68,7 @@ PostTraining(BaseModel) = optimize_behavior(
 ## Pipeline Position
 
 Post-training 位于 pretraining 之后、deployment 之前，是 base model 到产品模型之间的关键桥梁。
+
 ```mermaid
 flowchart TD
     A[Pretraining] --> B[Base Model]
