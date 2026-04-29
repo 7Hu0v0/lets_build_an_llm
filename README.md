@@ -40,6 +40,7 @@
 - `SKILL.md`：给 AI Agent 使用的说明书  
 - `README.md`：项目入口与阅读说明  
 - `references/`：真正的知识库内容  
+- `SKILL.json`：Skill 元信息配置
 
 ---
 
@@ -49,37 +50,29 @@
 
 ---
 
-### 01 Pipeline：大模型工业链路
+### 01 Core Pipeline：大模型工业链路
 
 这部分按照 LLM 从构建到部署的主流程组织。
 
-- [Compute](./references/01_pipeline/compute.md)
-- [Data](./references/01_pipeline/data.md)
-- [Architecture](./references/01_pipeline/architecture.md)
-- [Training Infrastructure](./references/01_pipeline/training_infra.md)
-- [Pretraining](./references/01_pipeline/pretraining.md)
-- [Mid-training](./references/01_pipeline/mid_training.md)
-- [Post-training](./references/01_pipeline/post_training.md)
-- [Evaluation](./references/01_pipeline/evaluation.md)
-- [Inference](./references/01_pipeline/inference.md)
-- [Agent](./references/01_pipeline/agent.md)
-- [Online Feedback](./references/01_pipeline/online_feedback.md)
+- [01a Compute](./references/01_core_pipeline/01a_compute.md)：算力、GPU 集群与训练资源入口
+- [01b Data](./references/01_core_pipeline/01b_data.md)：数据来源、清洗、配比与数据工程
+- [01c Architecture](./references/01_core_pipeline/01c_architecture.md)：模型架构与能力边界
+- [01d Training Infrastructure](./references/01_core_pipeline/01d_training_infra.md)：训练系统、分布式训练与工程基础设施
+- [01e Pretraining](./references/01_core_pipeline/01e_pretraining.md)：预训练目标、数据规模与 base model 形成
+- [01f Mid-training](./references/01_core_pipeline/01f_mid_training.md)：中训练与能力专项增强
+- [01g Post-training](./references/01_core_pipeline/01g_post_training.md)：从指令对齐到 Agentic 能力构建
+- [01h Evaluation](./references/01_core_pipeline/01h_evaluation.md)：评测体系、能力验证与回归测试
+- [01i Inference](./references/01_core_pipeline/01i_inference.md)：推理部署、服务化与成本效率
+- [01j Agent](./references/01_core_pipeline/01j_agent.md)：工具调用、任务执行与 Agent 工作流
+- [01k Online Feedback](./references/01_core_pipeline/01k_online_feedback.md)：线上反馈、数据闭环与持续改进
 
 ---
 
-### 02 Concepts：核心概念
+### 02 Core Concept：核心概念
 
 这部分解释 LLM 学习过程中反复出现的关键术语。
 
-- [Transformer](./references/02_concepts/transformer.md)
-- [Attention](./references/02_concepts/attention.md)
-- [MoE](./references/02_concepts/moe.md)
-- [Tokenizer](./references/02_concepts/tokenizer.md)
-- [SFT](./references/02_concepts/sft.md)
-- [RLHF](./references/02_concepts/rlhf.md)
-- [RLVR](./references/02_concepts/rlvr.md)
-- [KV Cache](./references/02_concepts/kv_cache.md)
-- [Tool Calling](./references/02_concepts/tool_calling.md)
+- [02a Category](./references/02_core_concept/02a_category.md)：训练信号、学习率等基础概念条目入口
 
 ---
 
@@ -117,3 +110,11 @@
 - [Candidate Signals](./references/05_recruiting/candidate_signals.md)
 - [Pre-talk Questions](./references/05_recruiting/pre_talk_questions.md)
 - [Lab Org Mapping](./references/05_recruiting/lab_org_mapping.md)
+
+---
+
+### Current Status
+
+- `01g_post_training.md` 已经展开为较完整的正文。
+- 其他 `01_core_pipeline` 文件目前已建好路径，后续可继续按同一模板补充内容。
+- `02_core_concept/`、`03_models/`、`04_benchmarks/`、`05_recruiting/` 已开始搭建 Wiki 骨架。
