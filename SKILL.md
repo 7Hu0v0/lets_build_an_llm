@@ -17,6 +17,7 @@ Do not add unnecessary categories, frameworks, or abstractions. Every concept mu
 3. preparing candidate pre-talk;
 4. judging candidate capability;
 5. mapping AI teams and talent.
+6. 多参考开源模型以获取更多信息，instead of 捕风捉影闭源模型、参考闭源模型很过时的博客
 
 ## Main Pipeline
 
