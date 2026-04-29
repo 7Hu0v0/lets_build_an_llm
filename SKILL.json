@@ -1,0 +1,74 @@
+{
+  "name": "lets_build_an_llm",
+  "display_name": "LM Wiki: Let's Build an LLM",
+  "version": "0.1.0",
+  "description": "A Non-Tech Staff friendly LM Wiki for understanding how modern LLMs are built, from compute and data to training, post-training, evaluation, inference, agents, and online feedback.",
+  "language": "zh-CN",
+  "entrypoint": "SKILL.md",
+  "readme": "README.md",
+  "references": "references/",
+  "author": {
+    "name": "Qirui Hu",
+    "github": "7Hu0v0"
+  },
+  "tags": [
+    "LLM",
+    "AI",
+    "Non-Tech Staff",
+    "AI Recruiting",
+    "Talent Mapping",
+    "Knowledge Base",
+    "Markdown Wiki"
+  ],
+  "goals": [
+    "Help Jeff build long-term AI technical understanding.",
+    "Help non-technical readers understand LLM industrial systems.",
+    "Make learning reusable, searchable, and agent-readable.",
+    "Support AI Talent Mapping, candidate pre-talk, technical briefing, and recruiting judgment."
+  ],
+  "principles": {
+    "core": "如无必要，勿增实体",
+    "reject": [
+      "够用就行",
+      "建一个博物馆",
+      "最近很火的"
+    ]
+  },
+  "pipeline": [
+    "Compute",
+    "Data",
+    "Architecture",
+    "Training Infrastructure",
+    "Pretraining",
+    "Mid-training",
+    "Post-training",
+    "Evaluation",
+    "Inference",
+    "Agent",
+    "Online Feedback"
+  ],
+  "default_output_format": [
+    "TL;DR",
+    "Definition",
+    "Pipeline Position",
+    "Technical Mechanism",
+    "Common Misunderstandings",
+    "Recruiting Lens",
+    "Simple Analogy",
+    "Sources"
+  ],
+  "source_policy": {
+    "require_sources_for": [
+      "model releases",
+      "benchmark scores",
+      "model parameters",
+      "company claims",
+      "paper methods",
+      "technical reports",
+      "GitHub repositories",
+      "model cards"
+    ],
+    "mark_uncertain_claims_as": "hypothesis / inference"
+  },
+  "license": "TBD"
+}
