@@ -71,32 +71,27 @@ Post-training 位于 pretraining 之后、deployment 之前，是 base model 到
 ```mermaid
 flowchart TD
     A[Pretraining] --> B[Base Model]
-    B --> C[Post-training System]
 
-    C --> S1[1. SFT / Instruction Tuning]
-    S1 --> S2[2. Reward / Verifier Construction]
-    S2 --> S3[3. Preference Optimization<br/>RLHF / RLAIF / DPO / IPO / KTO]
-    S3 --> S4[4. Verifiable RL<br/>RLVR / GRPO / PPO]
-    S4 --> S5[5. Sampling & Selection<br/>Rejection Sampling / Best-of-N]
-    S5 --> S6[6. Distillation / OPD]
-    S6 --> D[Chat Model / Reasoning Model / Agent Model]
+    B --> C["Post-training System
 
-    C --> T[Tool-use & Agent Training<br/>Cross-stage]
-    T -.-> S1
-    T -.-> S4
-    T -.-> D
+    • SFT (Instruction Tuning)
+    • Reward / Verifier
+    • Preference Optimization (RLHF / DPO / ...)
+    • Verifiable RL (RLVR / GRPO / ...)
+    • Sampling & Selection
+    • Distillation / OPD
+    • Tool-use & Agent Training
+    • Safety Alignment"]
 
-    C --> SAFE[Safety Alignment<br/>Cross-stage]
-    SAFE -.-> S1
-    SAFE -.-> S3
-    SAFE -.-> S4
-    SAFE -.-> D
+    C --> D[Chat Model / Reasoning Model / Agent Model]
 
     D --> E[Evaluation]
     E --> F[Deployment]
     F --> G[Online Feedback]
-    G --> C
+
+    G -.-> C
 ```
+
 ## What Changes After Post-training
 ## What Changes After Post-training
 ## Core Method
