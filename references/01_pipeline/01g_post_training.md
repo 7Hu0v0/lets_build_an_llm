@@ -68,30 +68,30 @@ PostTraining(BaseModel) = optimize_behavior(
 ## Pipeline Position
 
 Post-training 位于 pretraining 之后、deployment 之前，是 base model 到产品模型之间的关键桥梁。
-
 ```mermaid
 flowchart TD
     A[Pretraining] --> B[Base Model]
-    B --> C[Post-training]
-    
-    C --> C1[SFT<br/>Instruction Following]
-    C --> C2[Reward / Verifier<br/>Preference & Verifiable Signal]
-    C --> C3[Preference Optimization<br/>RLHF / RLAIF / DPO / IPO / KTO]
-    C --> C4[Verifiable RL<br/>RLVR / GRPO / PPO]
-    C --> C5[Sampling & Selection<br/>Rejection Sampling / Best-of-N]
-    C --> C6[Distillation<br/>Distillation / On-Policy Distillation]
-    C --> C7[Tool-use & Agent Training<br/>Tool-use Training / Agentic RL]
-    C --> C8[Safety Alignment]
-    
-    C1 --> D[Chat Model / Reasoning Model / Agent Model]
-    C2 --> D
-    C3 --> D
-    C4 --> D
-    C5 --> D
-    C6 --> D
-    C7 --> D
-    C8 --> D
-    
+    B --> C[Post-training System]
+
+    C --> S1[1. SFT / Instruction Tuning]
+    S1 --> S2[2. Reward / Verifier Construction]
+    S2 --> S3[3. Preference Optimization<br/>RLHF / RLAIF / DPO / IPO / KTO]
+    S3 --> S4[4. Verifiable RL<br/>RLVR / GRPO / PPO]
+    S4 --> S5[5. Sampling & Selection<br/>Rejection Sampling / Best-of-N]
+    S5 --> S6[6. Distillation / OPD]
+    S6 --> D[Chat Model / Reasoning Model / Agent Model]
+
+    C --> T[Tool-use & Agent Training<br/>Cross-stage]
+    T -.-> S1
+    T -.-> S4
+    T -.-> D
+
+    C --> SAFE[Safety Alignment<br/>Cross-stage]
+    SAFE -.-> S1
+    SAFE -.-> S3
+    SAFE -.-> S4
+    SAFE -.-> D
+
     D --> E[Evaluation]
     E --> F[Deployment]
     F --> G[Online Feedback]
