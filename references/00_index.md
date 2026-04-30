@@ -257,16 +257,6 @@ flowchart TD
 - 如何被验证？
 - 如何进入下一轮迭代？
 
-## Recruiting Translation
-
-把技术理解转化为候选人判断。
-
-建议包含：
-- Candidate Signal：强信号、弱信号、风险信号
-- Talk Track：opening question、deep-dive question、follow-up question
-- Role / Team Mapping：相关岗位、团队 ownership、上下游协作
-- Red Flags：容易夸大或误判的地方
-
 ## Sources
 
 列出 papers、technical reports、official blogs、benchmarks、GitHub repos、model cards 或 company announcements。
