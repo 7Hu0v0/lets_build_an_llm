@@ -49,7 +49,7 @@ LM Wiki 有三个目标：
   解释 tool calling、browser use、terminal use、planning、memory、workflow orchestration 和 agent task completion。
 
 - `references/01_core_pipeline/01k_online_feedback.md`
-  解释线上数据收集、失败案例挖掘、用户反馈、A/B testing 和 continuous post-training 闭环。
+  解释 Online Feedback、Online RL、rollout-driven post-training、训推一体、失败案例挖掘、A/B testing 和 continuous improvement 闭环。
 
 ---
 
