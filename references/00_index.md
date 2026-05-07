@@ -45,7 +45,7 @@ LM Wiki 有三个目标：
 - `references/01_core_pipeline/01i_inference.md`
   解释模型服务、KV cache、batching、quantization、speculative decoding、latency、throughput 和部署成本。
 
-- `references/01_core_pipeline/01j_agent.md`
+- `references/01_core_pipeline/01j_agent_harness.md`
   解释 tool calling、browser use、terminal use、planning、memory、workflow orchestration 和 agent task completion。
 
 - `references/01_core_pipeline/01k_online_feedback.md`
@@ -140,7 +140,7 @@ LM Wiki 有三个目标：
 4. `references/01_core_pipeline/01g_post_training.md`
 5. `references/01_core_pipeline/01h_evaluation.md`
 6. `references/01_core_pipeline/01i_inference.md`
-7. `references/01_core_pipeline/01j_agent.md`
+7. `references/01_core_pipeline/01j_agent_harness.md`
 
 目标是先建立直觉：模型从哪里学来能力，如何变得可用，如何被评测和部署。
 
@@ -159,7 +159,7 @@ LM Wiki 有三个目标：
 7. `references/01_core_pipeline/01g_post_training.md`
 8. `references/01_core_pipeline/01h_evaluation.md`
 9. `references/01_core_pipeline/01i_inference.md`
-10. `references/01_core_pipeline/01j_agent.md`
+10. `references/01_core_pipeline/01j_agent_harness.md`
 11. `references/01_core_pipeline/01k_online_feedback.md`
 
 目标是理解一个现代 LLM 从算力、数据、训练到产品化和持续迭代的完整链路。
@@ -262,3 +262,22 @@ flowchart TD
 列出 papers、technical reports、official blogs、benchmarks、GitHub repos、model cards 或 company announcements。
 未验证的信息必须标记为 inference / hypothesis。
 ````
+
+---
+
+## Update Log Template
+
+项目级更新统一写进 `README.md` 的 `Current Status`，并使用真实 git commit 时间。每次重要更新建议追加一个紧凑条目：
+
+```markdown
+#### YYYY-MM-DD HH:MM +TZ - Short Update Title
+
+- Commit: `short_sha`
+- Scope: pipeline / model / benchmark / recruiting / skill
+- Files: `path/to/file.md`, `path/to/other.md`
+- Change: 一句话说明改了什么。
+- Why it matters: 一句话说明它对理解 LLM 工业链路或招聘判断有什么价值。
+- Next: 可选，写下一步。
+```
+
+单篇 reference 的 `## Update Log` 只在内容会持续追踪变化时使用，例如模型家族、快速变化的 benchmark、Online RL 这类 living topic。一般放在 `Sources` 后面，避免打断正文阅读。

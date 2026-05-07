@@ -63,8 +63,8 @@
 - [01g Post-training](./references/01_core_pipeline/01g_post_training.md)：从指令对齐到 Agentic 能力构建
 - [01h Evaluation](./references/01_core_pipeline/01h_evaluation.md)：评测体系、能力验证与回归测试
 - [01i Inference](./references/01_core_pipeline/01i_inference.md)：推理部署、服务化与成本效率
-- [01j Agent](./references/01_core_pipeline/01j_agent.md)：工具调用、任务执行与 Agent 工作流
-- [01k Online Feedback](./references/01_core_pipeline/01k_online_feedback.md)：线上反馈、数据闭环与持续改进
+- [01j Agent Harness](./references/01_core_pipeline/01j_agent_harness.md)：工具调用、任务执行与 Agent 工作流
+- [01k Online Feedback](./references/01_core_pipeline/01k_online_feedback.md)：Online RL、rollout-driven post-training 与训推一体闭环
 
 ---
 
@@ -114,6 +114,25 @@
 ---
 
 ### Current Status
+
+#### 2026-05-07 17:58 +0800 - Online RL feedback note
+
+- Commit: `43bd156`
+- Scope: pipeline / online feedback
+- Files: `references/00_index.md`, `references/01_core_pipeline/01k_online_feedback.md`
+- Change: 新增 Online Feedback 主章节，把重点放在 Online RL、inference rollout、reward/verifier、RL training 和 policy update 形成的训推一体闭环。
+- Why it matters: 这把 Online Feedback 从“线上日志收集”推进到 frontier-lab-aware 的 post-training infrastructure 视角，更适合判断 Online RL / agent RL / RL infra 候选人。
+- Next: 继续补齐 `01i_inference.md` 和 `01j_agent_harness.md`，让 train-inference integration 的上下游链路更完整。
+
+#### 2026-04-30 10:41 +0800 - DeepSeek V4 analysis
+
+- Commit: `f1c4d22`
+- Scope: model
+- Files: `references/03_models/deepseek.md`
+- Change: 扩写 DeepSeek 模型家族笔记，新增 DeepSeek-V4 Preview 分析、目录、Sources 和页面级 Update Log。
+- Why it matters: 为 MoE、long context、reasoning、agentic coding 和 open-weight strategy 提供一个可持续更新的模型家族案例。
+
+#### Current Baseline
 
 - `01g_post_training.md` 已经展开为较完整的正文。
 - 其他 `01_core_pipeline` 文件目前已建好路径，后续可继续按同一模板补充内容。

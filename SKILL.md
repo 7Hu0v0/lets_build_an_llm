@@ -115,12 +115,31 @@ Recommended reference mapping:
 - `references/01_core_pipeline/01g_post_training.md`: SFT, RL, verifier, agentic data, safety, distillation, evaluation loop, and behavior optimization.
 - `references/01_core_pipeline/01h_evaluation.md`: benchmark, internal eval, real-world task eval, and regression testing.
 - `references/01_core_pipeline/01i_inference.md`: serving, KV cache, batching, quantization, speculative decoding, latency, throughput, and deployment cost.
-- `references/01_core_pipeline/01j_agent.md`: tool calling, browser use, terminal use, planning, memory, orchestration, and agent workflow.
+- `references/01_core_pipeline/01j_agent_harness.md`: tool calling, browser use, terminal use, planning, memory, orchestration, and agent workflow.
 - `references/01_core_pipeline/01k_online_feedback.md`: online data, failure mining, user feedback, A/B testing, and continuous post-training.
 - `references/02_core_concept/02a_category.md`: reusable concept entry point for training signals, learning rate, and related fundamentals.
 - `references/03_models/`: model family notes for GPT, Claude, Gemini, DeepSeek, Qwen, Llama, and Hunyuan.
 - `references/04_benchmarks/`: benchmark notes for MMLU, GPQA, SWE-bench, Terminal-Bench, and BrowseComp.
 - `references/05_recruiting/`: recruiting translation notes for role mapping, candidate signals, pre-talk questions, and lab org mapping.
+
+## Update Log Rules
+
+Use README `Current Status` as the project-level update log. For meaningful updates, append one compact entry with the real git commit time after the commit exists.
+
+Recommended format:
+
+```markdown
+#### YYYY-MM-DD HH:MM +TZ - Short Update Title
+
+- Commit: `short_sha`
+- Scope: pipeline / model / benchmark / recruiting / skill
+- Files: `path/to/file.md`, `path/to/other.md`
+- Change: one sentence explaining what changed
+- Why it matters: one sentence explaining the learning or recruiting value
+- Next: optional follow-up
+```
+
+Use per-reference `## Update Log` only when a page is expected to change repeatedly over time, such as model family notes, fast-moving benchmarks, or living research areas. Put per-reference update logs near the end of the page, usually after `Sources`, so the conceptual explanation remains easy to read.
 
 ## Writing Rules
 
