@@ -62,7 +62,7 @@
 - [01f Mid-training](./references/01_core_pipeline/01f_mid_training.md)：中训练与能力专项增强
 - [01g Post-training](./references/01_core_pipeline/01g_post_training.md)：从指令对齐到 Agentic 能力构建
 - [01h Evaluation](./references/01_core_pipeline/01h_evaluation.md)：评测体系、能力验证与回归测试
-- [01i Deployment & Inference](./references/01_core_pipeline/01i_inference.md)：serving runtime、vLLM、SGLang 与推理部署成本效率
+- [01i Deployment & Inference](./references/01_core_pipeline/01i_deployment_and_inference.md)：serving runtime、vLLM、SGLang 与推理部署成本效率
 - [01j Agent Harness](./references/01_core_pipeline/01j_agent_harness.md)：工具调用、任务执行与 Agent 工作流
 - [01k Online Feedback](./references/01_core_pipeline/01k_online_feedback.md)：Online RL、rollout-driven post-training 与训推一体闭环
 
@@ -122,7 +122,7 @@
 - Files: `references/00_index.md`, `references/01_core_pipeline/01k_online_feedback.md`
 - Change: 新增 Online Feedback 主章节，把重点放在 Online RL、inference rollout、reward/verifier、RL training 和 policy update 形成的训推一体闭环。
 - Why it matters: 这把 Online Feedback 从“线上日志收集”推进到 frontier-lab-aware 的 post-training infrastructure 视角，更适合判断 Online RL / agent RL / RL infra 候选人。
-- Next: 继续补齐 `01i_inference.md` 和 `01j_agent_harness.md`，让 train-inference integration 的上下游链路更完整。
+- Next: 继续补齐 `01j_agent_harness.md`，让 agent harness 和 train-inference integration 的上下游链路更完整。
 
 #### 2026-04-30 10:41 +0800 - DeepSeek V4 analysis
 

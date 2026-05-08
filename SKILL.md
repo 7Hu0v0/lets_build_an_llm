@@ -114,7 +114,7 @@ Recommended reference mapping:
 - `references/01_core_pipeline/01f_mid_training.md`: continued training for code, math, long context, domain knowledge, tool traces, and multimodal capability.
 - `references/01_core_pipeline/01g_post_training.md`: SFT, RL, verifier, agentic data, safety, distillation, evaluation loop, and behavior optimization.
 - `references/01_core_pipeline/01h_evaluation.md`: benchmark, internal eval, real-world task eval, and regression testing.
-- `references/01_core_pipeline/01i_inference.md`: serving, KV cache, batching, quantization, speculative decoding, latency, throughput, and deployment cost.
+- `references/01_core_pipeline/01i_deployment_and_inference.md`: serving, KV cache, batching, quantization, speculative decoding, latency, throughput, and deployment cost.
 - `references/01_core_pipeline/01j_agent_harness.md`: tool calling, browser use, terminal use, planning, memory, orchestration, and agent workflow.
 - `references/01_core_pipeline/01k_online_feedback.md`: online data, failure mining, user feedback, A/B testing, and continuous post-training.
 - `references/02_core_concept/02a_category.md`: reusable concept entry point for training signals, learning rate, and related fundamentals.

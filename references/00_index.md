@@ -42,7 +42,7 @@ LM Wiki 有三个目标：
 - `references/01_core_pipeline/01h_evaluation.md`
   解释 base eval、instruct eval、reasoning eval、coding eval、agent eval、long-context eval、人类偏好评测和业务评测。
 
-- `references/01_core_pipeline/01i_inference.md`
+- `references/01_core_pipeline/01i_deployment_and_inference.md`
   解释 Deployment & Inference、serving runtime、KV cache、batching、vLLM、SGLang、latency、throughput 和部署成本。
 
 - `references/01_core_pipeline/01j_agent_harness.md`
@@ -139,7 +139,7 @@ LM Wiki 有三个目标：
 3. `references/01_core_pipeline/01e_pretraining.md`
 4. `references/01_core_pipeline/01g_post_training.md`
 5. `references/01_core_pipeline/01h_evaluation.md`
-6. `references/01_core_pipeline/01i_inference.md`
+6. `references/01_core_pipeline/01i_deployment_and_inference.md`
 7. `references/01_core_pipeline/01j_agent_harness.md`
 
 目标是先建立直觉：模型从哪里学来能力，如何变得可用，如何被评测和部署。
@@ -158,7 +158,7 @@ LM Wiki 有三个目标：
 6. `references/01_core_pipeline/01f_mid_training.md`
 7. `references/01_core_pipeline/01g_post_training.md`
 8. `references/01_core_pipeline/01h_evaluation.md`
-9. `references/01_core_pipeline/01i_inference.md`
+9. `references/01_core_pipeline/01i_deployment_and_inference.md`
 10. `references/01_core_pipeline/01j_agent_harness.md`
 11. `references/01_core_pipeline/01k_online_feedback.md`
 
