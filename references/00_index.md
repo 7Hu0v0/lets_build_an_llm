@@ -43,7 +43,7 @@ LM Wiki 有三个目标：
   解释 base eval、instruct eval、reasoning eval、coding eval、agent eval、long-context eval、人类偏好评测和业务评测。
 
 - `references/01_core_pipeline/01i_inference.md`
-  解释模型服务、KV cache、batching、quantization、speculative decoding、latency、throughput 和部署成本。
+  解释 Deployment & Inference、serving runtime、KV cache、batching、vLLM、SGLang、latency、throughput 和部署成本。
 
 - `references/01_core_pipeline/01j_agent_harness.md`
   解释 tool calling、browser use、terminal use、planning、memory、workflow orchestration 和 agent task completion。
