@@ -58,7 +58,7 @@
 - [01b Data](./references/01_core_pipeline/01b_data.md)：数据来源、清洗、配比与数据工程
 - [01c Architecture](./references/01_core_pipeline/01c_architecture.md)：模型架构与能力边界
 - [01d Training Infrastructure](./references/01_core_pipeline/01d_training_infra.md)：训练系统、分布式训练与工程基础设施
-- [01e Pretraining](./references/01_core_pipeline/01e_pretraining.md)：预训练目标、数据规模与 base model 形成
+- [01e Pretraining](./references/01_core_pipeline/01e_pretraining.md)：训练目标、优化、schedule、数据课程表、稳定性与 base eval
 - [01f Mid-training](./references/01_core_pipeline/01f_mid_training.md)：中训练与能力专项增强
 - [01g Post-training](./references/01_core_pipeline/01g_post_training.md)：从指令对齐到 Agentic 能力构建
 - [01h Evaluation](./references/01_core_pipeline/01h_evaluation.md)：评测体系、能力验证与回归测试

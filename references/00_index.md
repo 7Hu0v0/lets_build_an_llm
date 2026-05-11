@@ -31,7 +31,7 @@ LM Wiki 有三个目标：
   解释分布式训练基础设施、并行策略、通信、checkpoint、容错和训练稳定性。
 
 - `references/01_core_pipeline/01e_pretraining.md`
-  解释 base model 如何通过 next-token prediction 学习语言、知识、代码、数学和基础推理能力。
+  解释 pretraining 如何通过训练目标、优化算法、训练策略、数据课程表、并行训练算法、稳定性技巧和 checkpoint/base eval 策略产出 base model。
 
 - `references/01_core_pipeline/01f_mid_training.md`
   解释模型在 pretraining 之后如何通过定向继续训练，强化代码、数学、长上下文、领域知识、工具使用或多模态能力。
