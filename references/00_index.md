@@ -25,7 +25,7 @@ LM Wiki 有三个目标：
   解释数据来源、清洗、过滤、去重、数据配比，以及 pretraining、mid-training、post-training、eval、online feedback 中不同数据集的作用。
 
 - `references/01_core_pipeline/01c_architecture.md`
-  解释 Transformer、Attention、MoE、长上下文、多模态架构，以及模型设计中的核心 trade-off。
+  解释模型结构蓝图、decoder-only Transformer forward path、attention、MoE、position/context、normalization、residual 和架构层面的能力/成本 trade-off。
 
 - `references/01_core_pipeline/01d_training_infra.md`
   解释分布式训练基础设施、并行策略、通信、checkpoint、容错和训练稳定性。
