@@ -146,26 +146,81 @@ Architecture 的核心问题是：
 Architecture 最核心的直觉是 forward path：一个 token sequence 如何流过模型。
 
 ```text
-Raw text
+text
 ↓
 Tokenizer
 ↓
 Token IDs
 ↓
-Embedding
-↓
-Position Information
+Embeddings
 ↓
 Transformer Block × N
 ↓
-Final Norm
+Final Hidden States
 ↓
 LM Head
 ↓
-Logits over Vocabulary
+Logits
 ```
 
-注意：loss、backward、optimizer update 不属于 architecture forward path。它们属于 pretraining。
+如果放到训练时的完整路径里，可以写成一句总公式：
+
+```text
+text
+→ tokens
+→ token IDs
+→ embeddings
+→ L × Transformer Blocks
+→ final hidden states
+→ LM head
+→ logits
+→ loss
+→ backprop
+```
+
+注意：`loss`、`backprop`、`optimizer update` 不是 architecture 模块，它们属于 pretraining。这里把它们放进路径，是为了说明 architecture 产生的 logits 如何接入训练信号，以及梯度如何从 loss 往回传到 embedding、attention、MLP、norm、LM head 等所有可训练参数。
+
+### Training Data Boundary
+
+进入 architecture 的不应该叫 raw data。Raw data 是清洗前的原始语料。
+
+在进入 tokenizer 之前，数据阶段通常已经完成：
+
+- cleaning；
+- deduplication；
+- filtering；
+- quality scoring；
+- mixture；
+- packing；
+- tokenized dataset preparation。
+
+所以 architecture 更准确地接收的是 training corpus / tokenized dataset，而不是未经处理的 raw data。
+
+### Tokenizer
+
+Tokenizer 把自然语言文本变成离散 token 序列：
+
+```text
+natural language text -> token IDs
+```
+
+Tokenizer 的输出是 token IDs。后续神经网络处理的不是汉字、英文单词或字符串本身，而是这些离散 ID。
+
+### Embedding
+
+Embedding table 把 token IDs 查表成连续向量：
+
+```text
+discrete token IDs -> continuous hidden vectors
+```
+
+这一步把离散符号带入神经网络的连续向量空间。后续所有 attention、MLP、normalization 处理的都是 hidden vectors / hidden states。
+
+### Transformer Blocks
+
+输入 hidden vectors 后，模型会经过 `L` 层 Transformer block 反复加工。
+
+Position encoding 不是“做一次就结束”的独立前处理。现代 LLM 常用 RoPE 这类方法，把位置信息加入 attention 的 Q / K 表示中。也就是说，position information 通常在每层 attention 计算里发挥作用，尤其影响长上下文建模。
 
 ### Transformer Block Loop
 
@@ -174,24 +229,108 @@ Logits over Vocabulary
 ```text
 hidden states
 ↓
-Norm
+Normalization
 ↓
-Masked Self-Attention
+Attention
 ↓
-Residual Add
+Add Residual after Attention
 ↓
-Norm
+Normalization
 ↓
 MLP / MoE
 ↓
-Residual Add
+Add Residual after MLP
 ↓
-updated hidden states
+block output
 ```
 
 这个循环不是“生成 token 的循环”，而是 hidden states 在多层网络中逐步被加工的循环。
 
 生成 token 的循环发生在 inference decode 阶段；每一步 decode 都会跑一次 forward，并生成一个新 token。
+
+#### Normalization
+
+Normalization 不是简单把 hidden vectors 压到 `[-1, 1]`。
+
+更准确地说，它控制 hidden states 的尺度 / 均方根，让不同 token、不同层的数值分布更稳定。现代 LLM 常用 RMSNorm，它主要调节向量长度，保留方向信息，避免后续 attention / MLP 中数值过大或过小。
+
+#### Attention
+
+Attention 让每个 token 的 hidden vector 根据上下文重新加权，得到带上下文信息的新表示。
+
+不同模型会使用不同 attention recipe：
+
+| Model Family | Common Attention Design |
+| --- | --- |
+| DeepSeek-V3 | MLA |
+| DeepSeek-V4 | CSA + HCA hybrid attention |
+| Llama 3 | GQA + RoPE |
+| Llama 4 | GQA / Flex Attention for long context, with MoE and native multimodal design |
+| Qwen2.5 | GQA + RoPE + QKV bias |
+| Qwen3 | GQA + QK LayerNorm + RoPE |
+
+这些差异都属于 architecture，因为它们改变 token 如何读取上下文，以及 KV cache、long-context、serving cost 如何变化。
+
+#### Add Residual after Attention
+
+Residual 不是“把注意力传回 backbone”，而是：
+
+```text
+attention_output + block_input = updated hidden states
+```
+
+这表示保留原始 hidden states，同时叠加 attention 学到的上下文信息。Residual 的作用是防止每一层都把原信息洗掉，也让深层训练更稳定。
+
+#### Second Normalization
+
+Attention 后得到的 hidden states 会再经过一次 normalization，准备送进 MLP / FFN。
+
+这里的逻辑是：
+
+```text
+Attention = token 之间的信息交互
+MLP / FFN = 每个 token 内部的特征加工
+```
+
+第二次 normalization 让 MLP 看到尺度更稳定的输入。
+
+#### MLP / FFN Forward
+
+MLP / FFN 不是最终输出，而是每个 token 的 hidden state 进入非线性变换。
+
+简单理解：attention 让 token 读上下文，MLP 则对读完上下文后的信息做“加工”。输出可以叫 `mlp_output` / `ffn_output`。
+
+#### Add Residual after MLP
+
+MLP 后再做一次 residual：
+
+```text
+mlp_output + attention-updated hidden states = block output
+```
+
+这个 block output 会进入下一层 Transformer block。重复 `L` 次后，得到 final hidden states。
+
+### Prediction Head, Loss, and Backprop
+
+`L` 层 Transformer blocks 结束后，模型得到 final hidden states。然后输入 LM head / prediction head，输出每个位置预测下一个 token 的 logits：
+
+```text
+final hidden states -> LM head -> next-token logits
+```
+
+训练时，再用 logits 和真实下一个 token 计算 cross-entropy loss：
+
+```text
+logits + target next token IDs -> cross-entropy loss
+```
+
+最后从 loss 做反向传播：
+
+```text
+loss -> backprop -> gradients -> optimizer update
+```
+
+反向传播不是“输出给 prediction head”，而是从 loss 往回传，更新 embedding、attention、MLP / MoE、normalization、LM head 等所有可训练参数。Optimizer update 的具体做法属于 `01e_pretraining.md`，但理解这个回传方向对读懂 architecture 很重要。
 
 ## Core Building Blocks
 
