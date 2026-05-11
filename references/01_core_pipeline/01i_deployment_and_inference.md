@@ -1,6 +1,6 @@
 # Deployment & Inference
-LLM Serving Runtime / From Checkpoint to Product Traffic
-> 中文直觉解释：Deployment 是让模型稳定地服务真实用户和真实业务，Inference 是让模型真正跑起来。
+From Model Checkpoint to Reliable Product Service
+> 中文直觉解释：Deployment 是把模型安全、稳定、可观测地上线；Inference 是 deployment 体系里真正执行模型计算的 runtime。
 
 ## Table of Contents
 
@@ -8,7 +8,10 @@ LLM Serving Runtime / From Checkpoint to Product Traffic
 - [Definition](#definition)
 - [Pipeline Position](#pipeline-position)
 - [Core Question](#core-question)
-- [Inference vs Deployment](#inference-vs-deployment)
+- [Why Deployment Comes First](#why-deployment-comes-first)
+- [Production Serving Stack](#production-serving-stack)
+- [Deployment Layer](#deployment-layer)
+- [Inference Runtime Layer](#inference-runtime-layer)
 - [Core Runtime Flow](#core-runtime-flow)
 - [Core System Problems](#core-system-problems)
 - [Serving Engines](#serving-engines)
@@ -26,22 +29,52 @@ LLM Serving Runtime / From Checkpoint to Product Traffic
 
 ## TL;DR
 
-Inference 不是简单地“把模型 forward 一次”。在工业系统里，Inference 是把 model checkpoint 变成可被 API、产品、agent、RAG、coding tool、RL rollout 调用的高性能执行层。
+工业界真实逻辑通常是 deployment-first：一个模型不能因为 checkpoint 已经训练好、vLLM / SGLang 能跑起来，就算进入生产。生产系统首先要回答：请求怎么进来、谁有权限、流量打到哪个模型、如何灰度、如何扩缩容、如何监控、出问题怎么回滚、成本是否可控、SLA 是否能守住。
 
-Deployment 是更大的上线工程：API gateway、鉴权、监控、日志、灰度、弹性扩缩容、SLA、成本和 A/B testing 都属于 deployment。vLLM、SGLang、TensorRT-LLM、TGI 这类系统更靠近 inference runtime / serving engine，而不是完整的 deployment platform。
+Inference 是 deployment 体系里的核心执行层。它负责把 model checkpoint 高效执行起来，处理 prefill、decode、KV cache、batching、sampling、streaming、structured output、parallelism 和 GPU utilization。vLLM、SGLang、TensorRT-LLM、TGI 这类系统更靠近 inference runtime / serving engine。
 
-现代 inference 的核心矛盾是：用户想要低延迟、流式输出、长上下文、稳定体验；系统想要高吞吐、高 GPU utilization、低显存浪费、低单位 token 成本。很多技术，例如 KV cache、continuous batching、PagedAttention、RadixAttention、prefill-decode disaggregation、MoE expert parallelism，本质上都在处理这个矛盾。
+所以这篇文档采用工业界更自然的顺序：**先讲 Deployment envelope，再讲 Inference runtime**。Deployment 决定模型服务能不能安全上线、稳定运行、被产品消费；Inference 决定模型执行是否快、稳、省。
 
-一句话记忆：**Inference 是让模型在真实流量下跑得快、稳、省；Deployment 是让这个服务可上线、可观测、可回滚、可扩展。**
+一句话记忆：**Deployment 是生产外壳和运维控制面；Inference 是模型执行引擎。**
 
 ## Definition
+
+Deployment 是上线和运维层：
+
+```python
+DeploymentPlatform = operate_model_service(
+    checkpoint = approved_model_checkpoint,
+    serving_runtime = inference_runtime,
+    controls = {
+        API_gateway,
+        auth,
+        rate_limit,
+        routing,
+        model_registry,
+        canary_release,
+        rollback,
+        autoscaling,
+        observability,
+        logging,
+        cost_control,
+        SLA,
+    },
+    consumers = {
+        product,
+        API,
+        agent,
+        batch_jobs,
+        RL_rollout,
+    },
+)
+```
 
 Inference 是模型执行层：
 
 ```python
 InferenceRuntime = execute_model(
-    checkpoint = trained_model,
-    requests = user_or_agent_requests,
+    checkpoint = loaded_model_weights,
+    requests = scheduled_requests,
     runtime = {
         tokenizer,
         prefill,
@@ -52,6 +85,7 @@ InferenceRuntime = execute_model(
         sampling,
         streaming,
         structured_output,
+        parallelism,
     },
     objective = {
         low_latency,
@@ -59,40 +93,24 @@ InferenceRuntime = execute_model(
         stable_P99,
         low_cost_per_token,
         high_GPU_utilization,
-    }
-)
-```
-
-Deployment 是上线运维层：
-
-```python
-DeploymentPlatform = operate_service(
-    inference_runtime = InferenceRuntime,
-    platform = {
-        API_gateway,
-        auth,
-        routing,
-        autoscaling,
-        observability,
-        logging,
-        canary_release,
-        fallback,
-        cost_control,
-        SLA,
-    }
+    },
 )
 ```
 
 两者关系：
 
 ```text
-Model Checkpoint
-↓
-Inference Runtime / Serving Engine
+Product / API / Agent Request
 ↓
 Deployment Platform
+  - gateway / auth / routing / monitoring / autoscaling / canary
 ↓
-Product / Agent / API / Online Feedback
+Inference Runtime
+  - prefill / decode / KV cache / batching / sampling
+↓
+Model Checkpoint on GPU
+↓
+Response / Stream / Tool Call / Rollout
 ```
 
 ## Pipeline Position
@@ -100,71 +118,212 @@ Product / Agent / API / Online Feedback
 ```mermaid
 flowchart TD
     A[Post-training] --> B[Evaluation]
-    B --> C[Model Checkpoint]
-    C --> D[Inference Runtime]
-    D --> E[Deployment Platform]
+    B --> C[Approved Checkpoint]
+    C --> D[Deployment Platform]
+    D --> E[Inference Runtime]
     E --> F[Product / API]
     E --> G[Agent Harness]
-    E --> H[Online Feedback]
-    H --> A
+    E --> H[RL Rollout]
+    F --> I[Online Feedback]
+    G --> I
+    H --> I
+    I --> A
 ```
 
-Inference 位于 evaluation 之后、agent / product / online feedback 之前。它接收的是已经训练和评测过的模型 checkpoint，输出的是可被真实请求调用的 model service。
+Deployment & Inference 位于 Evaluation 之后、Agent / Product / Online Feedback 之前。Evaluation 决定 checkpoint 能不能进入候选发布；Deployment 决定它如何上线；Inference 决定它如何被高效执行。
 
 它向上依赖：
 
-- Architecture：模型是 dense、MoE、MLA、long-context、multimodal，都会改变 serving 方式。
-- Training Infrastructure：checkpoint 格式、并行策略、量化策略会影响 inference。
-- Evaluation：只有通过核心 eval 和 regression test 的 checkpoint 才应该进入 serving。
+- Architecture：dense、MoE、MLA、long-context、multimodal 会改变 serving 和部署策略。
+- Training Infrastructure：checkpoint 格式、parallelism、quantization、optimizer artifact 会影响加载和 serving。
+- Evaluation：release gating、regression eval、safety eval 决定是否进入 canary。
 
 它向下影响：
 
-- Agent：agent 的多轮工具调用、长 trajectory、structured generation 会放大 serving runtime 价值。
-- Online Feedback：RL rollout、线上失败挖掘、A/B test 都依赖稳定 inference。
-- Product：用户直接感知 latency、流式输出、稳定性和成本。
+- Product：用户感知 latency、streaming、稳定性、错误率和成本。
+- Agent：多轮工具调用、长 trajectory、structured generation 会放大 runtime 复杂度。
+- Online Feedback：线上失败挖掘、A/B test、RL rollout 都依赖稳定的 model service。
 
 ## Core Question
 
 Deployment & Inference 的核心问题不是“这个模型能不能跑”，而是：
 
-> **如何让模型在真实流量、长上下文、多轮 agent、MoE 和 RL rollout 场景下，以可接受成本稳定运行？**
+> **如何让模型在真实流量、长上下文、多轮 agent、MoE 和 RL rollout 场景下，以可接受成本稳定上线和持续运行？**
 
-这也是为什么 inference infra 不只是后端工程，而是 AI Infra 的核心岗位之一。它连接 GPU systems、distributed systems、model architecture、serving platform、agent runtime 和 product reliability。
+这需要同时处理两个层次：
 
-## Inference vs Deployment
+- Deployment layer：上线、路由、监控、扩缩容、灰度、回滚、SLA、成本。
+- Inference runtime layer：prefill、decode、KV cache、batching、parallelism、latency、throughput。
 
-Inference 更关注模型执行本身：
+## Why Deployment Comes First
 
-- prefill / decode；
-- KV cache；
-- batching / scheduling；
-- attention kernel；
-- sampling；
-- streaming；
-- quantization；
-- structured output；
-- tensor / pipeline / expert parallelism。
+从学习模型内部机制时，先讲 inference 很自然，因为 prefill、decode、KV cache 是技术核心。
 
-Deployment 更关注服务上线和运维：
+但从工业界真实服务链路看，请求不是直接进入 vLLM / SGLang。请求通常先经过：
 
-- API gateway；
-- auth / rate limit；
-- monitoring / logging；
-- autoscaling；
-- canary / rollback；
-- SLA / incident response；
-- cost management；
-- A/B testing；
-- data privacy and compliance。
+```text
+Client / Product
+↓
+API Gateway
+↓
+Auth / Rate Limit / Quota
+↓
+Routing / Model Selection
+↓
+Deployment Controls
+↓
+Inference Runtime
+↓
+GPU Execution
+```
 
-边界可以这样理解：
+所以现实里，deployment 是外层控制面，inference 是内层执行引擎。一个模型服务能不能进入生产，不只取决于 tokens/sec，也取决于：
 
-| Layer | Core Question | Typical Owner |
+- 能否 canary；
+- 能否 rollback；
+- 能否 autoscale；
+- 能否观测 P99 和错误率；
+- 能否限制坏流量；
+- 能否满足 SLA；
+- 能否解释 cost；
+- 能否把线上失败回流到 eval / post-training。
+
+因此本文重构为 deployment-first，但不会弱化 inference。真正的工业理解必须同时看外壳和引擎。
+
+## Production Serving Stack
+
+一个现代 LLM serving stack 可以粗略分成 7 层：
+
+| Layer | What It Does | Typical Questions |
 | --- | --- | --- |
-| Inference Runtime | 模型如何被高效执行？ | Inference infra / GPU systems |
-| Serving API | 请求如何进入模型服务？ | Platform / backend |
-| Deployment Platform | 服务如何稳定上线和运维？ | Infra / SRE / platform |
-| Product Integration | 模型如何服务用户场景？ | Product engineering / agent team |
+| Product / Client | 用户或 agent 发起请求 | 谁在调用？交互是否同步？是否 streaming？ |
+| Gateway | 接入、鉴权、限流、配额 | 谁能访问？请求是否超配额？ |
+| Routing | 选择模型、版本、region、runtime | 用 cheap model 还是 strong model？走哪个 cluster？ |
+| Deployment Control | 灰度、回滚、扩缩容、健康检查 | 新模型是否只给 5% 流量？坏了怎么退？ |
+| Observability | metrics、logs、traces、cost | P99、TTFT、tokens/sec、error rate 如何变化？ |
+| Inference Runtime | 调度请求并执行模型 | KV cache、batching、prefill/decode 如何优化？ |
+| Model Weights / GPU | 实际计算资源 | 显存够吗？并行策略对吗？成本多少？ |
+
+很多团队会把这些能力拆给不同 owner：platform / SRE 负责 deployment control，inference infra 负责 runtime，GPU systems 负责 kernel 和 parallelism，product / agent team 负责 workload integration。
+
+## Deployment Layer
+
+Deployment layer 不是“把模型起起来”这么简单，它负责生产服务的控制面。
+
+### Model Packaging and Registry
+
+模型上线前需要明确：
+
+- checkpoint 版本；
+- tokenizer 版本；
+- model config；
+- quantization / precision；
+- adapter / LoRA；
+- safety config；
+- eval report；
+- release owner。
+
+Model registry 的价值是让模型版本可追踪、可回滚、可审计。否则一次线上 regression 很难定位是模型、tokenizer、prompt、runtime 还是 routing 变了。
+
+### API Gateway, Auth, Rate Limit
+
+模型服务通常不会裸露给外部调用。Gateway 负责：
+
+- authentication；
+- quota；
+- rate limit；
+- request validation；
+- request size limit；
+- tenant isolation；
+- abuse prevention。
+
+对 LLM 来说，rate limit 不只是 QPS，还要看 input tokens、output tokens、context length、tool calls 和 compute budget。
+
+### Routing and Model Selection
+
+Routing 决定请求去哪里：
+
+- 哪个模型；
+- 哪个版本；
+- 哪个 region；
+- 哪个 runtime；
+- cheap / fast / strong 哪个 tier；
+- 是否 fallback；
+- 是否启用 canary。
+
+对多模型系统，routing 是成本和质量的核心控制点。不是所有请求都应该打到最强模型，也不是所有请求都适合同一个 context length 或同一个 decoding policy。
+
+### Canary, Rollback, A/B Test
+
+新模型上线通常不会直接 100% 放量。更常见的是：
+
+```text
+shadow traffic
+↓
+1% canary
+↓
+5% canary
+↓
+A/B test
+↓
+full rollout
+```
+
+如果 P99、error rate、safety incident、user satisfaction 或 cost 变差，就需要 rollback。KServe、SageMaker、Triton + Kubernetes 这类系统都体现了类似的 production deployment 思路：模型服务需要健康检查、版本管理、流量切分和观测指标。
+
+### Autoscaling and Capacity Planning
+
+LLM autoscaling 比普通 web service 更难，因为成本和容量取决于：
+
+- request rate；
+- input length；
+- output length；
+- batch shape；
+- context length；
+- KV cache memory；
+- model size；
+- GPU type；
+- streaming duration。
+
+扩容也不是瞬间完成：大模型加载 checkpoint、warm cache、初始化 NCCL / runtime 都需要时间。因此 deployment layer 需要 capacity planning，而不是只依赖 reactive autoscaling。
+
+### Observability and SLO
+
+LLM service 至少要监控：
+
+- Time To First Token；
+- inter-token latency；
+- P50 / P95 / P99 latency；
+- request throughput；
+- tokens/sec；
+- error rate；
+- timeout rate；
+- GPU utilization；
+- KV cache hit rate；
+- queue length；
+- cost per 1M tokens；
+- canary vs stable comparison。
+
+只看平均 latency 会误导判断。用户体验和 agent reliability 往往被 tail latency 决定。
+
+## Inference Runtime Layer
+
+Inference runtime 是 deployment 体系里的模型执行引擎。它关注如何在 GPU 上高效执行模型。
+
+典型职责：
+
+- load model weights；
+- manage tokenizer and model config；
+- schedule requests；
+- prefill prompt；
+- decode output tokens；
+- manage KV cache；
+- batch and unbatch requests；
+- stream tokens；
+- enforce structured generation；
+- coordinate tensor / pipeline / expert parallelism。
+
+vLLM、SGLang、TensorRT-LLM、TGI、LMDeploy 等都属于这一层或与这一层强相关。
 
 ## Core Runtime Flow
 
@@ -265,6 +424,7 @@ final answer
 | vLLM | 通用高吞吐 LLM serving engine | open-source model API、chat、RAG、batch generation |
 | SGLang | 复杂 LLM workload serving runtime | agent、structured generation、MoE、RL rollout |
 | TensorRT-LLM | NVIDIA GPU 深度优化 inference stack | NVIDIA production environment、极致性能优化 |
+| Triton / Dynamo-Triton | 通用 inference server / MLOps integration | multi-framework serving、Kubernetes、Prometheus、enterprise deployment |
 | TGI | Hugging Face 生态 model serving | Hugging Face model deployment |
 | LMDeploy | 国内开源模型部署和推理加速生态 | 中文/国产模型、量化、部署 |
 | llama.cpp / Ollama | 本地推理和开发者体验 | Mac / PC 本地模型、小模型、离线测试 |
@@ -428,11 +588,9 @@ Next policy
 
 ## Deployment Patterns
 
-后续可以逐步展开以下 deployment patterns。当前先保留结构：
-
 ### Single-Model API Serving
 
-一个模型，一个 serving cluster，对外暴露 OpenAI-compatible API。适合早期产品、内部工具、batch generation。
+一个模型，一个 serving cluster，对外暴露 OpenAI-compatible API。适合早期产品、内部工具、batch generation。重点是稳定性、成本和基础监控。
 
 ### Multi-Model / Routing
 
@@ -440,11 +598,11 @@ Next policy
 
 ### Long-Context Serving
 
-长文档、代码仓库、agent memory 都会放大 prefill 和 KV cache 成本。需要关注 chunked prefill、prefix caching、disaggregation 和 admission control。
+长文档、代码仓库、agent memory 都会放大 prefill 和 KV cache 成本。需要关注 chunked prefill、prefix caching、disaggregation、request size limit 和 admission control。
 
 ### Agent Serving
 
-Agent 会产生多轮 LLM 调用、tool schema、sandbox result 和 branching trajectory。需要关注 structured generation、tool-call parsing、session state、prefix reuse 和 error recovery。
+Agent 会产生多轮 LLM 调用、tool schema、sandbox result 和 branching trajectory。需要关注 structured generation、tool-call parsing、session state、prefix reuse、error recovery 和 tool latency。
 
 ### RL Rollout Serving
 
@@ -460,7 +618,7 @@ llama.cpp / Ollama 这类系统适合本地开发、隐私场景、小模型和�
 
 ## System View
 
-Inference 是多条链路的交汇点：
+Deployment & Inference 是多条链路的交汇点：
 
 ```text
 Model Architecture
@@ -469,22 +627,33 @@ Model Architecture
 Evaluation
   -> release gating
 
-Inference Runtime
-  -> API / Agent / Rollout
-
 Deployment Platform
-  -> observability / scaling / cost
+  -> gateway / routing / scaling / observability
+
+Inference Runtime
+  -> prefill / decode / KV cache / batching
+
+Product / Agent / Rollout
+  -> real workload
 
 Online Feedback
   -> failure mining / RL rollout / regression eval
 ```
 
-这也是为什么 inference infra 候选人需要同时理解 GPU、模型、系统和产品。只会“起一个服务”不够；强候选人要能解释不同 workload 对 latency、throughput、KV cache、parallelism 和 cost 的压力。
+强系统视角要同时回答：
+
+- 这个模型版本是否应该上线？
+- 它应该服务哪些流量？
+- 请求如何被路由和限流？
+- runtime 如何保证 latency 和 throughput？
+- 出问题如何发现、止血和回滚？
+- 线上数据如何进入 eval / online feedback？
 
 ## Common Misunderstandings
 
+- Deployment 不等于 inference。Deployment 是生产控制面，Inference 是模型执行层。
 - Inference 不等于一次 forward。真实 serving 还包括 scheduling、batching、KV cache、streaming、parallelism 和 observability。
-- Deployment 不等于 inference。Deployment 是上线工程，Inference 是模型执行层。
+- 能跑 demo 不等于能上生产。生产需要 auth、rate limit、monitoring、canary、rollback、SLA 和 cost control。
 - vLLM / SGLang 不只是“部署工具”。它们是 serving runtime / inference engine。
 - SGLang 不是训练框架。它可以做 RL rollout backend，但不负责 optimizer update。
 - 大规模 GPU serving 不一定更低效。对于 MoE，如果 batch、expert placement 和 communication overlap 做得好，大规模 serving 可能更有效率。
@@ -497,8 +666,10 @@ Online Feedback
 
 Strong signals：
 
+- 能把 deployment layer 和 inference runtime layer 区分清楚。
+- 能解释 gateway、routing、canary、rollback、autoscaling、observability 在模型服务中的作用。
 - 能清楚解释 prefill vs decode、KV cache、continuous batching、prefix cache。
-- 做过 vLLM、SGLang、TensorRT-LLM、TGI 或自研 serving stack。
+- 做过 vLLM、SGLang、TensorRT-LLM、Triton、TGI 或自研 serving stack。
 - 理解 latency / throughput / cost / GPU utilization 的 trade-off。
 - 有 GPU systems、CUDA / Triton kernel、NCCL / RCCL、RDMA、multi-node serving 经验。
 - 做过 long-context serving、MoE serving、structured output、tool calling 或 agent runtime。
@@ -509,26 +680,30 @@ Weak signals：
 - 只会说“部署模型”，讲不清 serving runtime 内部如何调度请求。
 - 只关注 QPS，不关注 TTFT、P99、KV cache 和 cost per token。
 - 把 vLLM / SGLang 当成同质化工具，不看 workload shape。
+- 只会起 demo endpoint，讲不出生产灰度、回滚和观测。
 
 Risk signals：
 
 - 用 benchmark 吞吐替代真实流量判断，忽略 long tail latency。
 - 忽略 observability、rollback、canary 和 incident response。
 - 对 MoE / agent / RL rollout 的复杂度估计过低。
+- 混淆 platform owner、inference owner、agent owner 的职责边界。
 
 ### Role / Team Mapping
 
 | Role | Main Ownership |
 | --- | --- |
+| Deployment / platform engineer | API gateway、routing、scaling、observability、SLA、release process |
 | Inference infra engineer | serving engine、batching、KV cache、latency、throughput |
 | GPU systems engineer | kernels、memory、communication、parallelism |
-| Deployment / platform engineer | API gateway、scaling、observability、SLA |
 | Agent infra engineer | tool-use serving、session state、structured output、sandbox |
 | RL infra engineer | rollout engine、trajectory generation、trainer integration |
 | Model optimization engineer | quantization、speculative decoding、kernel / graph optimization |
 
 ### Pre-talk Questions
 
+- 为什么工业系统里通常要先讲 deployment，再讲 inference runtime？
+- 一个模型从 checkpoint 到线上 10% canary，需要经过哪些控制点？
 - LLM inference 中 prefill 和 decode 的区别是什么？为什么这个区别对线上体验重要？
 - 为什么 KV cache 会成为 inference 系统的核心瓶颈？
 - Continuous batching 解决什么问题？它会带来什么 trade-off？
@@ -536,12 +711,24 @@ Risk signals：
 - 长 prompt 为什么会影响 streaming decode 的 P99 latency？
 - Prefill-decode disaggregation 的收益和代价是什么？
 - MoE serving 为什么比 dense model serving 更复杂？
-- SGLang 在 RL post-training 中负责哪一部分？它为什么不是 RL trainer？
-- 如果一个 coding agent 的 tool-call latency 很高，你会从哪些层排查？
+- 如果一个 coding agent 的 tool-call latency 很高，你会从 deployment layer 和 inference layer 分别排查什么？
 
 ## Future Learning Slots
 
 这篇文档先作为 Deployment & Inference 的主入口，后续可以按专题继续扩展：
+
+### Deployment Operations
+
+- model registry；
+- endpoint lifecycle；
+- autoscaling；
+- canary release；
+- rollback；
+- rate limiting；
+- request priority；
+- observability；
+- incident playbook；
+- cost dashboard。
 
 ### Metrics
 
@@ -551,7 +738,8 @@ Risk signals：
 - tokens/sec；
 - requests/sec；
 - GPU utilization；
-- cache hit rate；
+- KV cache hit rate；
+- queue length；
 - cost per 1M tokens；
 - error rate / timeout rate。
 
@@ -576,17 +764,6 @@ Risk signals：
 - multi-node scheduling；
 - KV cache transfer。
 
-### Deployment Operations
-
-- autoscaling；
-- canary release；
-- rollback；
-- rate limiting；
-- request priority；
-- observability；
-- incident playbook；
-- cost dashboard。
-
 ### Workload-Specific Serving
 
 - RAG serving；
@@ -599,29 +776,37 @@ Risk signals：
 
 ## Simple Analogy
 
-Inference engine 像大型机场的空管系统。
+Deployment 像机场运营系统，Inference runtime 像空管和跑道调度系统。
 
-模型本身是飞机，GPU 是跑道，用户请求是航班。普通服务只是让飞机能起飞降落；高性能 inference engine 要调度航班、避免跑道拥堵、让长途航班不阻塞短途航班、复用共享航线，并让不同机型进入合适跑道。
+机场运营系统负责购票、安检、登机口、航班计划、延误通知、应急预案和客流控制；空管和跑道调度负责让飞机高效起降。
 
 对应到 LLM：
 
-- 航班调度 = request scheduling；
+- 机场入口 = API gateway；
+- 安检 = auth / rate limit；
+- 航班分配 = routing / model selection；
+- 灰度放量 = canary；
+- 延误通知 = observability / incident response；
 - 跑道 = GPU；
+- 空管 = inference runtime scheduler；
 - 长途航班 = long-context prefill；
-- 短途航班 = streaming decode；
-- 共享航线 = prefix / KV cache reuse；
-- 不同机型 = dense model / MoE model / agent workload；
-- 空管系统 = inference runtime。
+- 短途航班 = streaming decode。
+
+只研究跑道不够，因为机场要运营；只研究运营也不够，因为飞机必须高效起降。
 
 ## Sources
 
+- [NVIDIA Triton Inference Server overview](https://www.nvidia.com/en-us/ai-data-science/products/triton-inference-server/)
+- [NVIDIA Triton Inference Server documentation](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/index.html)
+- [Amazon SageMaker AI: Real-time inference](https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html)
+- [KServe: Canary rollout strategy](https://kserve.github.io/archive/0.13/modelserving/v1beta1/rollout/canary/)
+- [KServe: InferenceGraph](https://kserve.github.io/website/docs/concepts/resources/inferencegraph)
 - [vLLM GitHub repository](https://github.com/vllm-project/vllm)
 - [vLLM official website](https://vllm.ai/)
 - [vLLM documentation: Automatic Prefix Caching](https://docs.vllm.ai/en/v0.9.2/design/automatic_prefix_caching.html)
 - [SGLang documentation](https://docs.sglang.io/)
 - [SGLang documentation: Expert Parallelism](https://docs.sglang.io/advanced_features/expert_parallelism.html)
 - [NVIDIA TensorRT-LLM documentation](https://docs.nvidia.com/tensorrt-llm/)
-- [NVIDIA TensorRT-LLM product page](https://developer.nvidia.com/tensorrt-llm)
 - [Hugging Face Transformers: Continuous Batching](https://huggingface.co/docs/transformers/en/continuous_batching)
 - [Hugging Face Inference Endpoints: vLLM](https://huggingface.co/docs/inference-endpoints/en/engines/vllm)
 - [Hugging Face Inference Endpoints: SGLang](https://huggingface.co/docs/inference-endpoints/main/engines/sglang)
@@ -629,6 +814,8 @@ Inference engine 像大型机场的空管系统。
 
 ## Open Questions
 
+- Deployment platform 和 inference runtime 的团队边界在 frontier lab 里通常怎么切？
+- LLM gateway 应该按 QPS、tokens、cost budget 还是 workload type 限流？
 - vLLM 和 SGLang 在 production adoption 上的真实边界是什么？
 - PagedAttention 和 RadixAttention 是否会在长期演进中互相吸收？
 - Prefill-decode disaggregation 在什么流量形态下收益最大？
@@ -636,5 +823,4 @@ Inference engine 像大型机场的空管系统。
 - Hot expert replication 的动态策略如何设计？
 - SGLang / vLLM 在 RL rollout 中和 verl / OpenRLHF 如何协同？
 - Agent workload 是否会推动 inference runtime 成为新的基础设施控制点？
-- AMD GPU、TPU、Ascend 等非 NVIDIA 硬件会如何改变 inference stack？
 - Inference engine 会不会成为 future AI Infra 的核心控制面？
