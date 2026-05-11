@@ -1,6 +1,6 @@
 # Deployment & Inference
 LLM Serving Runtime / From Checkpoint to Product Traffic
-> 中文直觉解释：Inference 是让模型真正跑起来，Deployment 是让模型稳定地服务真实用户和真实业务。
+> 中文直觉解释：Deployment 是让模型稳定地服务真实用户和真实业务，Inference 是让模型真正跑起来。
 
 ## Table of Contents
 
