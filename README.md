@@ -115,6 +115,24 @@
 
 ### Current Status
 
+#### 2026-05-11 15:03 +0800 - Deployment-first inference rewrite
+
+- Commit: `7346654`
+- Scope: pipeline / deployment and inference
+- Files: `references/01_core_pipeline/01i_deployment_and_inference.md`
+- Change: 将 Deployment & Inference 主文档从 inference-first 重构为 deployment-first，先讲生产控制面，再下钻到 vLLM、SGLang、KV cache、prefill/decode 等 runtime 细节。
+- Why it matters: 更贴近工业界真实模型服务链路，有助于区分 deployment/platform engineer、inference runtime engineer、GPU systems engineer 和 agent infra engineer 的职责边界。
+- Next: 继续补充 deployment operations 的具体案例，例如 canary、rollback、autoscaling、model registry 和 observability。
+
+#### 2026-05-11 10:47 +0800 - Pretraining workstreams note
+
+- Commit: `e8411dd`
+- Scope: pipeline / pretraining
+- Files: `README.md`, `references/00_index.md`, `references/01_core_pipeline/01e_pretraining.md`
+- Change: 新增 Pretraining 主章节，按 training objective、optimization、training schedule、data curriculum、training infra algorithm、stability tricks、checkpoint & base eval 七类工作流组织。
+- Why it matters: 把 pretraining 从“喂很多数据”提升为完整工业系统视角，并用 DeepSeek-V4 作为 case study 连接 objective、optimizer、schedule、infra、stability 和 eval。
+- Next: 后续可继续扩展 optimizer、data curriculum、MoE stability 和 base eval 的专项页面。
+
 #### 2026-05-07 17:58 +0800 - Online RL feedback note
 
 - Commit: `43bd156`
