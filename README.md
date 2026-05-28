@@ -33,6 +33,33 @@
 
 ---
 
+## 🚀 Learning Fresher
+
+`Learning Fresher` 是这个 Wiki 的交互练习入口：把 LLM 工业链路拆成 10 题一组的学习任务，让读者在阅读之外，也能通过答题、复盘、错题和进度追踪来校准理解。
+
+当前版本是静态网页 MVP：
+
+- 10 题一组的 LLM fresher 练习；
+- 按 pipeline stage 筛选；
+- 支持搜索、随机、只看错题；
+- 本地保存答题进度；
+- 提交后显示答案解释和 recruiting translation；
+- 科幻风格学习控制台。
+
+本地预览：
+
+```bash
+python3 -m http.server 4173
+```
+
+然后打开：
+
+```text
+http://127.0.0.1:4173/
+```
+
+---
+
 ## 📚 Wiki Directory
 
 本项目采用 `SKILL.md + references/` 的结构：
