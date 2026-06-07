@@ -6,6 +6,7 @@ const state = {
   batchIndex: 0,
   query: "",
   stage: "all",
+  type: "all",
   wrongOnly: false,
   shuffle: false,
   order: [],
@@ -15,6 +16,7 @@ const state = {
 const els = {
   search: document.querySelector("#searchInput"),
   stageFilter: document.querySelector("#stageFilter"),
+  typeFilter: document.querySelector("#typeFilter"),
   wrongOnly: document.querySelector("#wrongOnly"),
   shuffleMode: document.querySelector("#shuffleMode"),
   doneCount: document.querySelector("#doneCount"),
@@ -60,6 +62,13 @@ function bindEvents() {
 
   els.stageFilter.addEventListener("change", () => {
     state.stage = els.stageFilter.value;
+    state.batchIndex = 0;
+    rebuildOrder();
+    renderAll();
+  });
+
+  els.typeFilter.addEventListener("change", () => {
+    state.type = els.typeFilter.value;
     state.batchIndex = 0;
     rebuildOrder();
     renderAll();
@@ -124,6 +133,7 @@ function filteredQuestions() {
 
     return (
       (state.stage === "all" || question.stage === state.stage) &&
+      (state.type === "all" || question.type === state.type) &&
       (!state.wrongOnly || progress.correct === false) &&
       (!state.query || text.includes(state.query))
     );
@@ -177,7 +187,7 @@ function renderStats() {
   els.accuracy.textContent = answers.length ? `${Math.round((right / answers.length) * 100)}%` : "0%";
   els.learningPercent.textContent = `${percent}%`;
   els.learningBar.style.width = `${percent}%`;
-  els.learningText.textContent = `${answers.length} / ${DATA.questions.length} signals calibrated`;
+  els.learningText.textContent = `完成 ${answers.length} / ${DATA.questions.length} 题`;
 }
 
 function renderRadar() {
@@ -221,12 +231,12 @@ function renderQuiz() {
   els.nextAfterBatch.hidden = !submitted;
 
   if (!batch.length) {
-    els.missionMeta.textContent = "No matching signal";
-    els.missionTitle.textContent = "Adjust filters";
-    els.batchTag.textContent = "Empty";
-    els.batchHint.textContent = "No questions match the current mission filter.";
+    els.missionMeta.textContent = "NO MATCH";
+    els.missionTitle.textContent = "没有匹配题目";
+    els.batchTag.textContent = "EMPTY";
+    els.batchHint.textContent = "调整筛选条件后再试。";
     els.batchAnswered.textContent = "0 / 0";
-    els.questionGrid.innerHTML = `<div class="empty-state">No matching questions.</div>`;
+    els.questionGrid.innerHTML = `<div class="empty-state">没有匹配的题目</div>`;
     els.batchResult.hidden = true;
     els.submitBatch.disabled = true;
     els.revealBatch.disabled = true;
@@ -235,10 +245,10 @@ function renderQuiz() {
 
   const start = state.batchIndex * BATCH_SIZE + 1;
   const end = start + batch.length - 1;
-  els.missionMeta.textContent = `${DATA.source} · Signal ${start}-${end}`;
-  els.missionTitle.textContent = state.stage === "all" ? "10-Signal Fresher Drill" : `${state.stage} Drill`;
-  els.batchTag.textContent = `Batch ${String(state.batchIndex + 1).padStart(2, "0")}`;
-  els.batchHint.textContent = submitted ? "Batch scored. Review signals before continuing." : "Complete the batch before submitting.";
+  els.missionMeta.textContent = `${DATA.source} · 第 ${start}-${end} 题`;
+  els.missionTitle.textContent = state.stage === "all" ? "10 题一组练习" : `${state.stage} 专项练习`;
+  els.batchTag.textContent = `BATCH ${String(state.batchIndex + 1).padStart(2, "0")}`;
+  els.batchHint.textContent = submitted ? "本组已评分，可复盘解析。" : "答完本组后统一评分。";
   els.batchAnswered.textContent = `${answered} / ${batch.length}`;
   els.submitBatch.disabled = submitted || answered < batch.length;
   els.revealBatch.disabled = submitted;
@@ -259,7 +269,7 @@ function renderQuestion(question, displayNumber, submitted) {
   article.innerHTML = `
     <div class="question-head">
       <span class="tag">${escapeHTML(question.stage)}</span>
-      <span>${escapeHTML(question.type)}</span>
+      <span>${escapeHTML(typeLabel(question.type))} · ${escapeHTML(sourceLabel(question.source))}</span>
     </div>
     <h3>${displayNumber}. ${escapeHTML(question.stem)}</h3>
     <div class="options"></div>
@@ -267,7 +277,7 @@ function renderQuestion(question, displayNumber, submitted) {
       <strong>${escapeHTML(answerLine(question, progress))}</strong>
       <p>${escapeHTML(question.explanation)}</p>
       <p class="translation">${escapeHTML(question.recruiting_translation)}</p>
-      <a href="./${encodeURI(question.source)}" target="_blank" rel="noreferrer">Open reference</a>
+      <a href="./${encodeURI(question.source)}" target="_blank" rel="noreferrer">打开 reference</a>
     </div>
   `;
 
@@ -327,7 +337,7 @@ function submitBatch() {
   const batch = currentBatch();
   const unanswered = batch.filter((question) => !selectedAnswers(question).length);
   if (unanswered.length) {
-    window.alert(`Still waiting for ${unanswered.length} signal(s).`);
+    window.alert(`还有 ${unanswered.length} 题未作答。`);
     return;
   }
 
@@ -378,20 +388,20 @@ function renderBatchResult(batch, submitted) {
 
   els.batchResult.hidden = false;
   els.batchResult.innerHTML = `
-    <strong>${right} / ${batch.length} · ${score}% calibrated</strong>
+    <strong>${right} / ${batch.length} · ${score}%</strong>
     <p>${missionReview(score, uniqueWrongStages)}</p>
   `;
 }
 
 function missionReview(score, wrongStages) {
-  if (score >= 90) return "Mission clean. Move to the next batch and keep pressure on scenario judgment.";
-  if (score >= 70) return `Core signal stable. Review ${wrongStages.join(", ") || "the missed items"} before the next run.`;
-  return `Calibration needed. Re-read ${wrongStages.join(", ") || "the linked references"} and retry the batch.`;
+  if (score >= 90) return "很稳。可以进入下一组，继续保持对场景判断题的敏感度。";
+  if (score >= 70) return `主线理解基本稳定。建议复盘 ${wrongStages.join("、") || "错题知识点"} 后再继续。`;
+  return `这一组需要回炉。先重读 ${wrongStages.join("、") || "对应 reference"}，再重新刷一遍。`;
 }
 
 function answerLine(question, progress) {
-  const choice = (progress.choice || []).join(", ") || "Not selected";
-  return `Your signal: ${choice} · Correct: ${question.answer.join(", ")}`;
+  const choice = (progress.choice || []).join(", ") || "未选择";
+  return `你的答案：${choice} · 正确答案：${question.answer.join(", ")}`;
 }
 
 function sameAnswer(left, right) {
@@ -401,7 +411,7 @@ function sameAnswer(left, right) {
 function exportWrong() {
   const wrong = DATA.questions.filter((question) => (state.progress[question.id] || {}).correct === false);
   if (!wrong.length) {
-    window.alert("No wrong signals yet.");
+    window.alert("目前还没有错题。");
     return;
   }
 
@@ -410,9 +420,9 @@ function exportWrong() {
       const progress = state.progress[question.id] || {};
       return [
         `${index + 1}. [${question.stage}] ${question.stem}`,
-        `Your signal: ${(progress.choice || []).join(", ") || "Not selected"}`,
-        `Correct: ${question.answer.join(", ")}`,
-        `Review: ${question.explanation}`,
+        `你的答案：${(progress.choice || []).join(", ") || "未选择"}`,
+        `正确答案：${question.answer.join(", ")}`,
+        `解析：${question.explanation}`,
         `Reference: ${question.source}`,
       ].join("\n");
     })
@@ -420,12 +430,12 @@ function exportWrong() {
 
   navigator.clipboard
     .writeText(text)
-    .then(() => window.alert("Wrong-signal deck copied."))
-    .catch(() => window.prompt("Copy wrong-signal deck:", text));
+    .then(() => window.alert("错题已复制到剪贴板。"))
+    .catch(() => window.prompt("复制错题：", text));
 }
 
 function resetProgress() {
-  if (!window.confirm("Reset local Learning Fresher progress?")) return;
+  if (!window.confirm("确定重置本地答题进度吗？")) return;
   state.progress = {};
   saveProgress();
   rebuildOrder();
@@ -456,4 +466,21 @@ function escapeHTML(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function typeLabel(type) {
+  return {
+    single_choice: "单选题",
+    multi_choice: "多选题",
+    true_false: "判断题",
+  }[type] || type;
+}
+
+function sourceLabel(source) {
+  if (source.includes("/03_models/")) return "模型家族";
+  if (source.includes("/04_benchmarks/")) return "评测基准";
+  if (source.includes("/05_recruiting/")) return "招聘判断";
+  if (source.includes("/01_core_pipeline/")) return "工业链路";
+  if (source.includes("/02_core_concept/")) return "核心概念";
+  return "总索引";
 }

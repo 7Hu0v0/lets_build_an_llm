@@ -276,6 +276,40 @@ window.LLM_FRESHER_DATA = {
       recruiting_translation: "能说出指标从哪里来、优化在哪一层生效、是否真实上线，是判断 inference 候选人的关键。"
     },
     {
+      id: "architecture-002",
+      stage: "Architecture",
+      type: "multi_choice",
+      difficulty: "fresher",
+      source: "references/01_core_pipeline/01c_architecture.md",
+      stem: "以下哪些属于 Architecture 章节关心的结构设计问题？",
+      options: [
+        { label: "A", text: "使用 dense MLP 还是 MoE" },
+        { label: "B", text: "Attention、position encoding、normalization 和 residual path 如何组织" },
+        { label: "C", text: "learning rate warmup / decay 的具体 schedule" },
+        { label: "D", text: "上下文长度、KV cache 成本和推理延迟之间的 trade-off" }
+      ],
+      answer: ["A", "B", "D"],
+      explanation: "Architecture 关注模型计算图和结构约束；learning rate schedule 属于 pretraining recipe。",
+      recruiting_translation: "架构候选人如果能把结构选择连接到训练稳定性和推理成本，而不是只背模块名，信号更强。"
+    },
+    {
+      id: "eval-002",
+      stage: "Evaluation",
+      type: "multi_choice",
+      difficulty: "fresher",
+      source: "references/01_core_pipeline/01h_evaluation.md",
+      stem: "判断模型真实能力时，哪些评测视角通常需要结合？",
+      options: [
+        { label: "A", text: "公开 benchmark" },
+        { label: "B", text: "internal eval 和 regression test" },
+        { label: "C", text: "真实任务 / 产品场景表现" },
+        { label: "D", text: "只看模型名字是否热门" }
+      ],
+      answer: ["A", "B", "C"],
+      explanation: "公开 benchmark 有横向参考价值，但真实能力还要结合内部评测、回归测试、用户任务和产品失败模式。",
+      recruiting_translation: "评测候选人应该能解释不同 eval 的覆盖范围、盲区和上线决策价值。"
+    },
+    {
       id: "misconception-001",
       stage: "Evaluation",
       type: "true_false",
