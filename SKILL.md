@@ -31,7 +31,7 @@ Always organize knowledge around the LLM industrial pipeline:
 6. Mid-training
 7. Post-training
 8. Evaluation
-9. Inference
+9. Deployment & Inference
 10. Agent
 11. Online Feedback
 
@@ -114,7 +114,7 @@ Recommended reference mapping:
 - `references/01_core_pipeline/01f_mid_training.md`: continued training for code, math, long context, domain knowledge, tool traces, and multimodal capability.
 - `references/01_core_pipeline/01g_post_training.md`: SFT, RL, verifier, agentic data, safety, distillation, evaluation loop, and behavior optimization.
 - `references/01_core_pipeline/01h_evaluation.md`: benchmark, internal eval, real-world task eval, and regression testing.
-- `references/01_core_pipeline/01i_deployment_and_inference.md`: serving, KV cache, batching, quantization, speculative decoding, latency, throughput, and deployment cost.
+- `references/01_core_pipeline/01i_deployment_and_inference.md`: industrial deployment and inference loop, foundation/platform/application inference ownership, serving runtime, KV cache, batching, routing, SLA, latency, throughput, and deployment cost.
 - `references/01_core_pipeline/01j_agent_harness.md`: tool calling, browser use, terminal use, planning, memory, orchestration, and agent workflow.
 - `references/01_core_pipeline/01k_online_feedback.md`: online data, failure mining, user feedback, A/B testing, and continuous post-training.
 - `references/02_core_concept/02a_category.md`: reusable concept entry point for training signals, learning rate, and related fundamentals.
@@ -180,6 +180,28 @@ Learning loop:
 4. Review: show answers, explanations, source links, and recruiting translations.
 5. Patch Weakness: suggest reference pages based on wrong answers.
 6. Export: copy wrong questions for later review.
+
+## Deployment & Inference Writing Rules
+
+When writing or rewriting Deployment & Inference content, do not start from a list of frameworks. Start from the industrial loop:
+
+1. Observe workload: traffic shape, token length, context length, tool calls, model mix, tenant, and spike pattern.
+2. Define target: TTFT, P99, availability, cost per token, GPU utilization, and business metric.
+3. Diagnose bottleneck: routing, queue, prefill, decode, KV cache, network, expert routing, tool latency, or product chain.
+4. Choose intervention: model, runtime, batching, cache, quantization, routing, prompt, post-training, or product flow.
+5. Verify offline: replay traffic, benchmark, regression eval, safety eval, and load test.
+6. Release online: shadow traffic, canary, A/B test, rollback, and full rollout.
+7. Feed back: send failures, cost curves, latency profiles, and user feedback to eval, post-training, architecture, runtime, and product strategy.
+
+Always distinguish three ownership layers:
+
+| Layer | Core Question |
+| --- | --- |
+| Foundation model inference | How does this self-developed model run fast, stable, and cheap? |
+| Platform / cloud inference | How do many models, tenants, hardware pools, and deployment environments run at scale? |
+| Application inference | How does a concrete product use multiple models to improve business outcomes? |
+
+For recruiting translation, ask candidates which layer they owned, what workload they served, what metric they optimized, what intervention they made, and how the change was verified. Avoid treating vLLM, SGLang, TensorRT-LLM, Triton, or any single framework as the whole topic.
 
 Sci-fi direction:
 

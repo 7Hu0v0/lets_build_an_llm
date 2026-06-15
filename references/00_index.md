@@ -10,7 +10,7 @@ LM Wiki 有三个目标：
 
 本知识库围绕 LLM Industrial Pipeline 组织：
 
-> Compute -> Data -> Architecture -> Training Infrastructure -> Pretraining -> Mid-training -> Post-training -> Evaluation -> Inference -> Agent -> Online Feedback
+> Compute -> Data -> Architecture -> Training Infrastructure -> Pretraining -> Mid-training -> Post-training -> Evaluation -> Deployment & Inference -> Agent -> Online Feedback
 
 ---
 
@@ -43,7 +43,7 @@ LM Wiki 有三个目标：
   解释 base eval、instruct eval、reasoning eval、coding eval、agent eval、long-context eval、人类偏好评测和业务评测。
 
 - `references/01_core_pipeline/01i_deployment_and_inference.md`
-  解释 Deployment & Inference、serving runtime、KV cache、batching、vLLM、SGLang、latency、throughput 和部署成本。
+  解释 Deployment & Inference 的工业闭环、基模/平台/应用三层推理分工、serving runtime、KV cache、batching、routing、SLA、latency、throughput 和部署成本。
 
 - `references/01_core_pipeline/01j_agent_harness.md`
   解释 tool calling、browser use、terminal use、planning、memory、workflow orchestration 和 agent task completion。
