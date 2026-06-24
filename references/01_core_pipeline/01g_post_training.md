@@ -1,4 +1,4 @@
-# Post-training
+<img width="1528" height="784" alt="image" src="https://github.com/user-attachments/assets/ed60e91c-89e8-4ae8-981e-86f7f7f38952" /># Post-training
 From Instruction Alignment to Agentic Capability Construction
 > 从“让模型会回答”到“让模型会推理、会调用工具、会解决问题”
 
@@ -110,6 +110,37 @@ Post-training 的核心配方可以极简理解为两类：
 因此，本节先聚焦 post-training 在算法层面的核心 recipe：SFT 如何让模型学会回应，RL 如何让模型学会优化行为。至于数据、reward、eval、infra 和 safety 如何共同组成完整生态，我们将在下一节从 system view 展开。
 
 
+## SFT
+
+## RL
+
+PPO 的核心链路
+<img width="1528" height="784" alt="image" src="https://github.com/user-attachments/assets/6df02b8e-96c1-4e4c-a503-a7b9e1a40cc1" />
+
+q → policy model → o
+o → reward model + KL penalty → r
+o / state → value model → v
+r + v → GAE → A
+A → 更新 policy model
+
+Q1 PPO的核心思想是什么？用一句话概括
+A1 PPO 的核心思想是：在 reward 的引导下更新 Policy Model，让模型更多生成高分回答，同时通过 KL / clipping 限制每次更新幅度，避免模型为了追求 reward 一下子跑偏。
+
+Q2 PPO中为什么有三个model？Reference Model、Reward Model、Value Model分别是什么？
+
+
+Q3 q是什么？o是什么？r是什么？v是什么？GAE是什么？A是什么？
+
+
+
+
+
+GRPO的核心链路
+
+
+## 合版
+
+OPD
 
 
 
