@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LLM 刷题终端 | Let's Build an LLM</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="stars" aria-hidden="true"></div>
+    <aside class="mission-panel">
+      <header class="brand">
+        <span class="brand-mark">LLM</span>
+        <div>
+          <h1>LLM 刷题终端</h1>
+          <p>Let's Build an LLM drill system</p>
+        </div>
+      </header>
+
+      <section class="control-block">
+        <label class="field">
+          <span>搜索</span>
+          <input id="searchInput" type="search" placeholder="阶段 / 关键词 / 答案 / 解析" />
+        </label>
+
+        <label class="field">
+          <span>知识点</span>
+          <select id="stageFilter">
+            <option value="all">全部知识点</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>题型</span>
+          <select id="typeFilter">
+            <option value="all">全部题型</option>
+            <option value="single_choice">单选题</option>
+            <option value="multi_choice">多选题</option>
+            <option value="true_false">判断题</option>
+          </select>
+        </label>
+
+        <div class="toggle-grid">
+          <label>
+            <input id="wrongOnly" type="checkbox" />
+            <span>只看错题</span>
+          </label>
+          <label>
+            <input id="shuffleMode" type="checkbox" />
+            <span>随机顺序</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="telemetry" aria-label="学习进度">
+        <div>
+          <strong id="doneCount">0</strong>
+          <span>已答</span>
+        </div>
+        <div>
+          <strong id="rightCount">0</strong>
+          <span>正确</span>
+        </div>
+        <div>
+          <strong id="accuracy">0%</strong>
+          <span>正确率</span>
+        </div>
+      </section>
+
+      <section class="progress-card">
+        <div class="progress-top">
+          <span>总进度</span>
+          <strong id="learningPercent">0%</strong>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <span id="learningBar"></span>
+        </div>
+        <p id="learningText">完成 0 / 0 题</p>
+      </section>
+
+      <section class="stage-radar">
+        <div class="section-head">
+          <span>知识点掌握</span>
+          <button id="exportWrong" type="button">导出错题</button>
+        </div>
+        <div id="stageRadarList" class="radar-list"></div>
+      </section>
+
+      <button id="resetProgress" class="reset-button" type="button">重置进度</button>
+    </aside>
+
+    <main class="cockpit">
+      <header class="topbar">
+        <div>
+          <p id="missionMeta" class="eyebrow">READY</p>
+          <h2 id="missionTitle">10 题一组练习</h2>
+        </div>
+        <nav class="pager" aria-label="任务组导航">
+          <button id="prevBatch" type="button" aria-label="上一组">‹</button>
+          <span id="pageText">0 / 0</span>
+          <button id="nextBatch" type="button" aria-label="下一组">›</button>
+        </nav>
+      </header>
+
+      <section class="mission-card">
+        <div class="batch-head">
+          <div>
+            <span id="batchTag" class="tag">Batch 01</span>
+            <p id="batchHint">答完本组后统一评分。</p>
+          </div>
+          <strong id="batchAnswered">0 / 10</strong>
+        </div>
+
+        <div id="questionGrid" class="question-grid"></div>
+        <div id="batchResult" class="batch-result" hidden></div>
+
+        <div class="card-actions">
+          <button id="revealBatch" class="secondary" type="button">查看答案</button>
+          <button id="submitBatch" class="primary" type="button">提交本组</button>
+          <button id="nextAfterBatch" class="primary" type="button">下一组</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="./data.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>

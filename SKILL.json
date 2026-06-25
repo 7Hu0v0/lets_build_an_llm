@@ -43,7 +43,7 @@
     "Mid-training",
     "Post-training",
     "Evaluation",
-    "Inference",
+    "Deployment & Inference",
     "Agent",
     "Online Feedback"
   ],
@@ -51,6 +51,8 @@
     "TL;DR",
     "Definition",
     "Pipeline Position",
+    "Industrial Loop",
+    "Team Ownership",
     "Technical Mechanism",
     "Common Misunderstandings",
     "Recruiting Lens",

@@ -31,7 +31,7 @@ Always organize knowledge around the LLM industrial pipeline:
 6. Mid-training
 7. Post-training
 8. Evaluation
-9. Inference
+9. Deployment & Inference
 10. Agent
 11. Online Feedback
 
@@ -114,13 +114,101 @@ Recommended reference mapping:
 - `references/01_core_pipeline/01f_mid_training.md`: continued training for code, math, long context, domain knowledge, tool traces, and multimodal capability.
 - `references/01_core_pipeline/01g_post_training.md`: SFT, RL, verifier, agentic data, safety, distillation, evaluation loop, and behavior optimization.
 - `references/01_core_pipeline/01h_evaluation.md`: benchmark, internal eval, real-world task eval, and regression testing.
-- `references/01_core_pipeline/01i_deployment_and_inference.md`: serving, KV cache, batching, quantization, speculative decoding, latency, throughput, and deployment cost.
+- `references/01_core_pipeline/01i_deployment_and_inference.md`: industrial deployment and inference loop, foundation/platform/application inference ownership, serving runtime, KV cache, batching, routing, SLA, latency, throughput, and deployment cost.
 - `references/01_core_pipeline/01j_agent_harness.md`: tool calling, browser use, terminal use, planning, memory, orchestration, and agent workflow.
 - `references/01_core_pipeline/01k_online_feedback.md`: online data, failure mining, user feedback, A/B testing, and continuous post-training.
 - `references/02_core_concept/02a_category.md`: reusable concept entry point for training signals, learning rate, and related fundamentals.
 - `references/03_models/`: model family notes for GPT, Claude, Gemini, DeepSeek, Qwen, Llama, and Hunyuan.
 - `references/04_benchmarks/`: benchmark notes for MMLU, GPQA, SWE-bench, Terminal-Bench, and BrowseComp.
 - `references/05_recruiting/`: recruiting translation notes for role mapping, candidate signals, pre-talk questions, and lab org mapping.
+
+## Learning Fresher
+
+Learning Fresher is the interactive quiz layer for this repository. It should turn the Markdown wiki into small, repeatable learning drills without changing the wiki's core purpose.
+
+Product positioning:
+
+- It is a learning cockpit for LLM industrial pipeline knowledge, not a generic quiz game.
+- It should help a non-technical recruiter move from "I read the concept" to "I can explain it, ask about it, and judge candidate ownership."
+- It should preserve Occam's Razor: no heavy backend, login, leaderboard, or decorative complexity unless the learning loop truly needs it.
+
+Default mechanism:
+
+- Use 10 questions per batch.
+- Score only after a whole batch is submitted.
+- Save progress locally in the browser.
+- Support search, stage filtering, shuffle mode, wrong-only review, and wrong-question export.
+- Always show explanation, source reference, and recruiting translation after submission.
+
+Question taxonomy:
+
+| Type | Purpose |
+| --- | --- |
+| `single_choice` | Check concept boundaries. |
+| `multi_choice` | Check trade-offs with multiple valid factors. |
+| `true_false` | Correct common misconceptions. |
+| `scenario` | Train candidate judgment and ownership reading. |
+| `ordering` | Test whether the learner understands pipeline sequence. |
+
+Question data should stay structured:
+
+```js
+{
+  id: "eval-001",
+  stage: "Evaluation",
+  type: "single_choice",
+  difficulty: "fresher",
+  source: "references/01_core_pipeline/01h_evaluation.md",
+  stem: "为什么只看公开 benchmark score 不足以判断模型真实能力？",
+  options: [
+    { label: "A", text: "公开 benchmark 通常无法覆盖真实任务分布" },
+    { label: "B", text: "benchmark 分数永远不可信" },
+    { label: "C", text: "模型部署后不需要评测" },
+    { label: "D", text: "评测只属于 research team" }
+  ],
+  answer: ["A"],
+  explanation: "公开 benchmark 可以提供横向参考，但真实产品能力还需要 internal eval、regression test 和 task-level eval。",
+  recruiting_translation: "能讲清楚 benchmark 与真实任务 eval 边界的人，通常更懂 eval ownership。"
+}
+```
+
+Learning loop:
+
+1. Select Mission: choose pipeline stage, difficulty, or random mode.
+2. Drill Batch: complete 10 questions without immediate scoring.
+3. Submit: show score, accuracy, and wrong stages.
+4. Review: show answers, explanations, source links, and recruiting translations.
+5. Patch Weakness: suggest reference pages based on wrong answers.
+6. Export: copy wrong questions for later review.
+
+## Deployment & Inference Writing Rules
+
+When writing or rewriting Deployment & Inference content, do not start from a list of frameworks. Start from the industrial loop:
+
+1. Observe workload: traffic shape, token length, context length, tool calls, model mix, tenant, and spike pattern.
+2. Define target: TTFT, P99, availability, cost per token, GPU utilization, and business metric.
+3. Diagnose bottleneck: routing, queue, prefill, decode, KV cache, network, expert routing, tool latency, or product chain.
+4. Choose intervention: model, runtime, batching, cache, quantization, routing, prompt, post-training, or product flow.
+5. Verify offline: replay traffic, benchmark, regression eval, safety eval, and load test.
+6. Release online: shadow traffic, canary, A/B test, rollback, and full rollout.
+7. Feed back: send failures, cost curves, latency profiles, and user feedback to eval, post-training, architecture, runtime, and product strategy.
+
+Always distinguish three ownership layers:
+
+| Layer | Core Question |
+| --- | --- |
+| Foundation model inference | How does this self-developed model run fast, stable, and cheap? |
+| Platform / cloud inference | How do many models, tenants, hardware pools, and deployment environments run at scale? |
+| Application inference | How does a concrete product use multiple models to improve business outcomes? |
+
+For recruiting translation, ask candidates which layer they owned, what workload they served, what metric they optimized, what intervention they made, and how the change was verified. Avoid treating vLLM, SGLang, TensorRT-LLM, Triton, or any single framework as the whole topic.
+
+Sci-fi direction:
+
+- First screen should be the usable training cockpit, not a landing page.
+- Prefer a calm deep-space control panel: dark background, cyan system status, lime mastery state, amber review state.
+- Use structured cockpit layout: mission sidebar, main drill area, progress/radar panel.
+- Use subtle glow, scanning lines, and mission language; avoid heavy game mechanics and distracting animation.
 
 ## Update Log Rules
 
